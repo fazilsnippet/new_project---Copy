@@ -126,10 +126,10 @@ const generateAccessTokenAndRefreshToken = async (userid) => {
         },
         { new: true }
       );
-      const options = {
-        httpOnly: true,
-        secure: true,
-      }; 
+      // const options = {
+      //   httpOnly: true,
+      //   secure: true,
+      // }; 
       return res
         .status(200)
         .clearCookie("accessToken", options)

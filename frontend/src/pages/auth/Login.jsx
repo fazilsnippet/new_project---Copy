@@ -20,7 +20,7 @@ const Login = () => {
     try {
       const userData = await loginUser({ email, userName, password }).unwrap();
       dispatch(setCredentials(userData));
-      navigate("/home");
+      navigate("/");
     } catch (err) {
       console.error("Login failed", err);
     }

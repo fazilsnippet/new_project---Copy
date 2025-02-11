@@ -24,9 +24,9 @@ app.use(cors({ origin: 'http://localhost:5173' }));
 //   origin: process.env.CORS_ORIGIN ,  // Set the origin of allowed requests
 //   //credentials: true,  // Enable sending cookies with the response
 // }));  // Enable cross-origin requests
+app.use(express.json()); // Ensure JSON parsing is enabled
 app.use(express.static("public"))
-app.use(express.json({limit: "16kb"}));
-app.use(express.urlencoded({extended: true, limit: "16kb"}))
+app.use(express.urlencoded({extended: true}))
 // app.use(bodyParser.json());  // Parse incoming JSON requests
 app.use(cookieParser());  // Parse cookies attached to the request
 

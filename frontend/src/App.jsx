@@ -1,5 +1,6 @@
-import Login from "./pages/auth/login";
+import Login from "./pages/auth/Login.jsx";
 import Register from "./pages/auth/register";
+import Product from "./pages/Products/product.jsx";
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/home"; // Example Home Page
@@ -11,6 +12,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/product/:productId" element={<Product />} />
+
 
       </Routes>
     </Router>

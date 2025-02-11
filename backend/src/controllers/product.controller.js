@@ -312,15 +312,37 @@ const getAllProducts = asyncHandler(async (req, res) => {
     res.status(500).json({ message: "An error occurred while fetching products", error: error.message });
   }
 });
+import mongoose from "mongoose";
+
 
 const getProductById = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.productId)
-    .populate('category', 'name');
+  console.log("Received req.params:", JSON.stringify(req.params, null, 2)); // Debugging
+  let { productId } = req.params;
 
-  if (!product) return res.status(404).json({ message: "Product not found" });
+  // Convert productId to a string if it’s an object
+  productId = String(productId);
 
-  res.status(200).json({ product });
+  console.log("Converted productId:", productId, typeof productId);
+
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    return res.status(400).json({ message: "Invalid product ID" });
+  }
+
+  const product = await Product.findById(productId);
+
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+
+  res.status(200).json(product);
 });
+
+
+
+
+
+
+
 
 const updateProduct = asyncHandler(async (req, res) => {
   const { name, description, price, images, category, stock } = req.body;

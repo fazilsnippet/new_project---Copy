@@ -1,0 +1,41 @@
+.home-page {
+    padding: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .home-page h1 {
+    font-size: 2.5em;
+    margin-bottom: 16px;
+    color: #333;
+  }
+  
+  .shop-link {
+    display: inline-block;
+    margin-bottom: 24px;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    color: #fff;
+    background-color: #007bff;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+  
+  .shop-link:hover {
+    background-color: #0056b3;
+  }
+  
+  .product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+  }
+  
+  .product-item {
+    flex: 1 1 calc(33.333% - 32px);
+    box-sizing: border-box;
+    margin-bottom: 16px;
+  }

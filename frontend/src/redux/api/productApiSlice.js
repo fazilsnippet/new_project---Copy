@@ -1,58 +1,54 @@
-
-// productSlice.js
-import { apiSlice } from './apiSlice'; // Import the base apiSlice setup
-import { PRODUCT_URL } from '../constants';// Import the product URL from constants
+import { apiSlice } from './apiSlice';
+import { PRODUCT_URL } from '../constants';
 
 export const productSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // Get all products (public route)
     getAllProducts: builder.query({
-      query: () => PRODUCT_URL, // Use PRODUCT_URL for fetching all products
-      providesTags: ['Product'], // This tag will help to manage cache and invalidate data
+      query: () => PRODUCT_URL,
+      providesTags: ['Product'],
+    }),
+
+    getProductById: builder.query({
+      query: (productId) => {
+        productId = String(productId); // Convert to string here
+        console.log("Making API request with productId:", productId, typeof productId);
+        return `/api/products/${productId}`;
+      },
+      providesTags: (result, error, productId) => [{ type: 'Product', id: String(productId) }],
     }),
     
 
-    // Get prodduct by ID
-    getProductById: builder.query({
-      query: (productId) => `${PRODUCT_URL}/${productId}`, // Use PRODUCT_URL + productId
-      providesTags: (result, error, productId) => [{ type: 'Product', id: productId }],
-    }),
-
-    // Create a new product (protected route)
     createProduct: builder.mutation({
       query: (newProduct) => ({
-        url: PRODUCT_URL, // POST request to create a new product
+        url: PRODUCT_URL,
         method: 'POST',
-        body: newProduct, // Send the new product data
+        body: newProduct,
       }),
-      invalidatesTags: ['Product'], // Invalidate product cache after creating a new product
+      invalidatesTags: ['Product'],
     }),
 
-    // Update a product by ID (protected route)
     updateProduct: builder.mutation({
-      query: (updatedProduct) => ({
-        url: `${PRODUCT_URL}/${productId}`, // PUT request with productId
+      query: ({ productId, updatedProduct }) => ({
+        url: `${PRODUCT_URL}/${productId}`,
         method: 'PUT',
-        body: updatedProduct, // Send updated product data
+        body: updatedProduct,
       }),
       invalidatesTags: (result, error, { productId }) => [{ type: 'Product', id: productId }],
     }),
 
-    // Delete a product by ID (protected route)
     deleteProduct: builder.mutation({
       query: (productId) => ({
-        url: `${PRODUCT_URL}/${productId}`, // DELETE request with productId
+        url: `${PRODUCT_URL}/${productId}`,
         method: 'DELETE',
       }),
       invalidatesTags: (result, error, { productId }) => [{ type: 'Product', id: productId }],
     }),
 
-    // Add a review to a product (protected route)
     createReview: builder.mutation({
       query: ({ productId, review }) => ({
-        url: `${PRODUCT_URL}/${productId}/review`, // POST request to add review
+        url: `${PRODUCT_URL}/${productId}/review`,
         method: 'POST',
-        body: review, // Send review data
+        body: review,
       }),
       invalidatesTags: (result, error, { productId }) => [{ type: 'Product', id: productId }],
     }),

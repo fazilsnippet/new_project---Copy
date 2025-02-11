@@ -1,0 +1,54 @@
+.product-review {
+    margin: 16px 0;
+  }
+  
+  .product-review h3 {
+    font-size: 1.5em;
+    margin-bottom: 16px;
+    color: #333;
+  }
+  
+  .review-item {
+    border-bottom: 1px solid #ddd;
+    padding: 8px 0;
+  }
+  
+  .review-item p {
+    margin: 4px 0;
+    color: #666;
+  }
+  
+  .add-review {
+    margin-top: 16px;
+  }
+  
+  .add-review h4 {
+    font-size: 1.2em;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  .add-review input,
+  .add-review textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+  }
+  
+  .add-review button {
+    padding: 8px 16px;
+    font-size: 1em;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .add-review button:hover {
+    background-color: #0056b3;
+  }

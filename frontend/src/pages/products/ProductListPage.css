@@ -1,0 +1,15 @@
+.product-list-page {
+    padding: 16px;
+  }
+  
+  .product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+  }
+  
+  .product-list-page .product-filter,
+  .product-list-page .product-search {
+    margin-bottom: 16px;
+  }
