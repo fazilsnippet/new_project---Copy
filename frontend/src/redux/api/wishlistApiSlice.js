@@ -5,7 +5,7 @@ export const wishlistSlice = apiSlice.injectEndpoints({
     // Fetch advanced wishlist details for a specific user (protected route)
     getAdvancedWishlist: builder.query({
       query: ({ userId, skip = 0, limit = 20 }) => ({
-        url: WISHLIST_URL, // GET request to fetch the advanced wishlist
+        url: WISHLIST_URL, 
         method: 'GET',
         params: { skip, limit }, // Pagination parameters are always included
       }),

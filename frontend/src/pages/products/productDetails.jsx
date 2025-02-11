@@ -2,7 +2,10 @@ import React from 'react'
 
 const productDetails = () => {
   return (
-    <div>all the products are pending</div>
+    <div>all the products are pending
+
+
+    </div>
   )
 }
 

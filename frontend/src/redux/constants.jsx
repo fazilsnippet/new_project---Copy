@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://localhost:5173';
+export const BASE_URL = 'http://localhost:8001';
 // export const BASE_URL = '';
 
 export const USERS_URL = "/api/users";

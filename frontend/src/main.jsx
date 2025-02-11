@@ -1,18 +1,18 @@
 import "./index.css";
-import App from "./App";
-import ReactDom from "react-dom/client";
-import { Provider } from "react-redux";
-import store from "./redux/store";
-import Login from "./pages/auth/login";
-import Register from "./pages/auth/register";
-import React from "react";
-import Homepage from "./pages/Home";
-import ProductDetails from "./pages/products/ProductDetails";
-import Cart from "./pages/Cart";
-import Wishlist from "./pages/Wishlist";
+// import App from "./App";
+// import ReactDom from "react-dom/client";
+// import { Provider } from "react-redux";
+// import store from "./redux/store";
+// import Login from "./pages/auth/login";
+// import Register from "./pages/auth/register";
+// import React from "react";
+// import Homepage from "./pages/Home";
+// import ProductDetails from "./pages/products/ProductDetails";
+// import Cart from "./pages/Cart";
+// import Wishlist from "./pages/Wishlist";
 
-import { Route, RouterProvider, createRoutesFromElements } from "react-router";
-import { createBrowserRouter } from "react-router-dom";
+// import { Route, RouterProvider, createRoutesFromElements } from "react-router";
+// import { createBrowserRouter } from "react-router-dom";
 
 
 // const router = createBrowserRouter([
@@ -30,19 +30,33 @@ import { createBrowserRouter } from "react-router-dom";
 //   },
 // ]);
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path="/" element={<App />}>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route index={true} path="/" element={<Homepage />} />
-      <Route path= "/wishlist" element={<Wishlist />} />
-      <Route path="/product/:id" element={<ProductDetails />} />
-      <Route path="/cart" element={<Cart />} />
-      </Route>))
+// const router = createBrowserRouter(
+//   createRoutesFromElements(
+//     <Route path="/" element={<App />}>
+//       <Route path="/login" element={<Login />} />
+//       <Route path="/register" element={<Register />} />
+//       <Route index={true} path="/" element={<Homepage />} />
+//       <Route path= "/wishlist" element={<Wishlist />} />
+//       <Route path="/product/:id" element={<ProductDetails />} />
+//       <Route path="/cart" element={<Cart />} />
+//       </Route>))
 
-ReactDom.createRoot(document.getElementById("root")).render(
-  <Provider store={store}>
-    <RouterProvider router={router} />
-  </Provider>
+// ReactDom.createRoot(document.getElementById("root")).render(
+//   <Provider store={store}>
+//     <RouterProvider router={router} />
+//   </Provider>
+// );
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { Provider } from "react-redux";
+import store from "./redux/store";
+import App from "./App";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </React.StrictMode>
 );

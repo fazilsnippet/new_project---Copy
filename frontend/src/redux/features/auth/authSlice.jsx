@@ -19,7 +19,8 @@ const authSlice = createSlice({
     },
     logout: (state) => {
       state.userInfo = null;
-      localStorage.clear();
+      localStorage.removeItem("userInfo"); // Ensure it's cleared from local storage
+      localStorage.removeItem("expirationTime"); // Clear expiration time as well
     },
   },
 });
