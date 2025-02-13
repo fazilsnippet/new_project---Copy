@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useGetProductByIdQuery } from '../slices/productSlice';
-import ProductReview from '../components/ProductReview';
+import { useGetProductByIdQuery } from '../../redux/api/productApiSlice';
+import ProductReview from './ProductReview';
 import './ProductDetailPage.css'; // Import the CSS file
 
 const ProductDetailPage = () => {

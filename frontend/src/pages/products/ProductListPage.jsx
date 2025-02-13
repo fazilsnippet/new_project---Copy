@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useGetAllProductsQuery } from '../slices/productSlice';
-import ProductCard from '../components/ProductCards';
-import ProductFilter from '../components/ProductFilter';
-import ProductSearch from '../components/ProductSearch';
+import { useGetAllProductsQuery } from '../../redux/api/productApiSlice';
+import ProductCard from './ProductCards.jsx';
+import ProductFilter from './ProductFilter.jsx';
+import ProductSearch from './ProductSearch.jsx';
 import './ProductListPage.css'; // Import the CSS file
 
 const ProductListPage = () => {
@@ -21,17 +21,19 @@ const ProductListPage = () => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
+  // Ensure products is an array
+  const productList = Array.isArray(products) ? products : Object.values(products);
+
   return (
     <div className="product-list-page">
       <ProductFilter onFilter={handleFilter} />
       <ProductSearch onSearch={handleSearch} />
       <div className="product-list">
-        {products.map((product) => (
-          <ProductCard key={product._id} product={product} />
+        {productList.map((product) => (
+          <ProductCard key={product._id || product.id || product.name} product={product} />
         ))}
       </div>
     </div>
-  );
-};
+  );}
 
-export default ProductListPage;
+export default ProductListPage

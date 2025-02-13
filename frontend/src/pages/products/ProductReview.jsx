@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useCreateReviewMutation } from '../slices/productSlice';
+import { useCreateReviewMutation } from '../../redux/api/productApiSlice';
 import './ProductReview.css'; // Import the CSS file
 
 const ProductReview = ({ productId, reviews }) => {

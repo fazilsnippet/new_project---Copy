@@ -1,0 +1,20 @@
+ .products-page {
+    padding: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+  }
+  
+  .product-item {
+    flex: 1 1 calc(33.333% - 32px);
+    box-sizing: border-box;
+    margin-bottom: 16px;
+  } 
+  

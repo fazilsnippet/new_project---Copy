@@ -337,13 +337,6 @@ const getProductById = asyncHandler(async (req, res) => {
   res.status(200).json(product);
 });
 
-
-
-
-
-
-
-
 const updateProduct = asyncHandler(async (req, res) => {
   const { name, description, price, images, category, stock } = req.body;
 
