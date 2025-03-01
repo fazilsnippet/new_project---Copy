@@ -258,55 +258,32 @@ const getAllProducts = asyncHandler(async (req, res) => {
   try {
     const { category, minPrice, maxPrice, search, sort, page = 1, limit = 10 } = req.query;
 
-    // Initialize filters
     const filter = {};
 
-    // 1. Filter by Category
     if (category) filter.category = category;
-
-    // 2. Filter by Price Range
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = parseFloat(minPrice);
       if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
-
-      if (minPrice && maxPrice && parseFloat(minPrice) > parseFloat(maxPrice)) {
-        return res.status(400).json({ message: "minPrice should be less than maxPrice" });
-      }
     }
-
-    // 3. Search by Name or Description
     if (search) {
       filter.$or = [
-        { name: { $regex: search, $options: "i" } }, // Case-insensitive search on name
-        { description: { $regex: search, $options: "i" } }, // Case-insensitive search on description
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
       ];
     }
 
-    // 4. Define Sorting
     const sortOptions = sort ? { [sort]: 1 } : { createdAt: -1 };
-
-    // 5. Pagination Logic
     const paginationLimit = parseInt(limit, 10);
     const skip = (parseInt(page, 10) - 1) * paginationLimit;
 
-    // 6. Query the Database
     const products = await Product.find(filter)
-      .populate("category", "name") // Populate category details
+      .populate("category", "name")
       .sort(sortOptions)
-      .skip(skip) // For pagination
+      .skip(skip)
       .limit(paginationLimit);
 
-    // 7. Get Total Count for Pagination
-    const totalProducts = await Product.countDocuments(filter);
-
-    // Response
-    res.status(200).json({
-      products,
-      totalProducts,
-      currentPage: parseInt(page, 10),
-      totalPages: Math.ceil(totalProducts / paginationLimit),
-    });
+    res.status(200).json(products); // Now returns only an array
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred while fetching products", error: error.message });
