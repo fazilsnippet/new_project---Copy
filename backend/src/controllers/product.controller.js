@@ -168,8 +168,8 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 
 const createProduct = asyncHandler(async (req, res) => {
-  const { description, price, category, name,stock, brand , images} = req.body;
-
+  const { description, price, category, name,stock, brand } = req.body;
+const {images}= req.files;
   try {
     // 1. Validate Required Fields
     // if (!name || !price || !category || !req.files || req.files.length === 0) {
