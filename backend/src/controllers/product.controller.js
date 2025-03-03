@@ -166,8 +166,8 @@ import { Product } from '../models/product.model.js';
 import { Category } from '../models/category.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
-
-const createProduct = asyncHandler(async (req, res) => {
+//testing fazil
+/*const createProduct = asyncHandler(async (req, res) => {
   const { description, price, category, name,stock, brand } = req.body;
 const {images}= req.files;
   try {
@@ -246,6 +246,61 @@ const {images}= req.files;
     });
   } catch (error) {
     // Handle Errors Gracefully
+    console.error(error);
+    res.status(500).json({
+      message: "An error occurred while creating the product",
+      error: error.message,
+    });
+  }
+});*/
+
+const createProduct = asyncHandler(async (req, res) => {
+  const { description, price, category, name, stock, brand } = req.body;
+  const images = req.files; // Multer stores files in `req.files`
+
+  try {
+    // 1. Validate Required Fields
+    if (!name) return res.status(400).json({ message: "Name is required" });
+    if (!price) return res.status(400).json({ message: "Price is required" });
+    if (!category) return res.status(400).json({ message: "Category is required" });
+    if (!images || images.length === 0) return res.status(400).json({ message: "Images are required" });
+
+    // 2. Validate Category Existence
+    const categoryExists = await Category.findById(category);
+    if (!categoryExists) {
+      return res.status(400).json({ message: "Invalid category" });
+    }
+
+    // 3. Upload Images to Cloudinary
+    const uploadedImages = [];
+    
+    for (const file of images) {
+      const uploadedImage = await uploadOnCloudinary(file.path);
+      if (!uploadedImage?.secure_url) {
+        return res.status(500).json({ message: "Failed to upload images" });
+      }
+      uploadedImages.push(uploadedImage.secure_url);
+    }
+
+    // 4. Create the Product
+    const newProduct = new Product({
+      name,
+      description,
+      price,
+      images: uploadedImages, // Store Cloudinary URLs
+      category,
+      stock,
+      brand,
+    });
+
+    await newProduct.save();
+
+    // 5. Response
+    res.status(201).json({
+      message: "Product created successfully",
+      product: newProduct,
+    });
+  } catch (error) {
     console.error(error);
     res.status(500).json({
       message: "An error occurred while creating the product",
