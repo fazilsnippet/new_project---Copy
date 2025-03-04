@@ -162,31 +162,23 @@
 //     getProductById,
 //   };
 
+import mongoose from "mongoose";
 import { Product } from '../models/product.model.js';
 import { Category } from '../models/category.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 
 const createProduct = asyncHandler(async (req, res) => {
-  const { description, price, category, name,stock, brand , images} = req.body;
+  const { description, price, category, name, stock, brand } = req.body;
+  const images = req.files; // Multer stores files in `req.files`
 
   try {
     // 1. Validate Required Fields
-    // if (!name || !price || !category || !req.files || req.files.length === 0) {
-    //   return res.status(400).json({ message: "Missing required fields or images" });
-    // }
-    if(!name){
-      return res.status(400).json({ message: "Name is required" });
-    }
-    if(!price){
-      return res.status(400).json({ message: "price is required" });
-    }
-    if(!category){
-      return res.status(400).json({ message: "category is required" });
-    }
-    if( !req.files || req.files.length === 0){
-      return res.status(400).json({ message: "Images are required" });
-    }
+    if (!name) return res.status(400).json({ message: "Name is required" });
+    if (!price) return res.status(400).json({ message: "Price is required" });
+    if (!category) return res.status(400).json({ message: "Category is required" });
+    if (!images || images.length === 0) return res.status(400).json({ message: "Images are required" });
+
     // 2. Validate Category Existence
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
@@ -195,57 +187,34 @@ const createProduct = asyncHandler(async (req, res) => {
 
     // 3. Upload Images to Cloudinary
     const uploadedImages = [];
-    for (const file of req.files) {
-      try {
-        const uploadedImage = await uploadOnCloudinary(file.path);
-        if (uploadedImage && uploadedImage.secure_url) {
-          uploadedImages.push(uploadedImage.secure_url);
-        } else {
-          console.error("Failed to upload image:", file.path);
-        }
-      } catch (error) {
-        console.error("Error uploading image:", error.message);
+
+    for (const file of images) {
+      const uploadedImage = await uploadOnCloudinary(file.path);
+      if (!uploadedImage?.secure_url) {
+        return res.status(500).json({ message: "Failed to upload images" });
       }
-    }
-    
-    // Validate Uploaded Images
-    if (uploadedImages.length === 0) {
-      return res.status(400).json({
-        message: "No valid images were uploaded",
-        details: "Ensure files are valid and meet upload requirements",
-      });
-    }
-  //   const uploadedImages = [];
-  // for (const file of req.files) {
-  //   const uploadedImage = await uploadOnCloudinary(file.path);
-  //   uploadedImages.push(uploadedImage.secure_url);
-  // }
-
-    // 4. Extra Validation for Uploaded Images
-    if (uploadedImages.length === 0) {
-      return res.status(400).json({ message: "No valid images were uploaded" });
+      uploadedImages.push(uploadedImage.secure_url);
     }
 
-    // 5. Create the Product
+    // 4. Create the Product
     const newProduct = new Product({
       name,
       description,
       price,
-      images: uploadedImages, // Store uploaded image URLs
+      images: uploadedImages, // Store Cloudinary URLs
       category,
       stock,
-      brand
+      brand,
     });
 
     await newProduct.save();
 
-    // 6. Response
+    // 5. Response
     res.status(201).json({
       message: "Product created successfully",
       product: newProduct,
     });
   } catch (error) {
-    // Handle Errors Gracefully
     console.error(error);
     res.status(500).json({
       message: "An error occurred while creating the product",
@@ -269,17 +238,13 @@ const getAllProducts = asyncHandler(async (req, res) => {
       filter.price = {};
       if (minPrice) filter.price.$gte = parseFloat(minPrice);
       if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
-
-      if (minPrice && maxPrice && parseFloat(minPrice) > parseFloat(maxPrice)) {
-        return res.status(400).json({ message: "minPrice should be less than maxPrice" });
-      }
     }
 
     // 3. Search by Name or Description
     if (search) {
       filter.$or = [
-        { name: { $regex: search, $options: "i" } }, // Case-insensitive search on name
-        { description: { $regex: search, $options: "i" } }, // Case-insensitive search on description
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
       ];
     }
 
@@ -297,23 +262,13 @@ const getAllProducts = asyncHandler(async (req, res) => {
       .skip(skip) // For pagination
       .limit(paginationLimit);
 
-    // 7. Get Total Count for Pagination
-    const totalProducts = await Product.countDocuments(filter);
-
     // Response
-    res.status(200).json({
-      products,
-      totalProducts,
-      currentPage: parseInt(page, 10),
-      totalPages: Math.ceil(totalProducts / paginationLimit),
-    });
+    res.status(200).json(products); // Return only the array of products
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred while fetching products", error: error.message });
   }
 });
-import mongoose from "mongoose";
-
 
 const getProductById = asyncHandler(async (req, res) => {
   console.log("Received req.params:", JSON.stringify(req.params, null, 2)); // Debugging
@@ -321,7 +276,7 @@ const getProductById = asyncHandler(async (req, res) => {
 
   // Convert productId to a string if it’s an object
   productId = String(productId);
-
+//testing fazil
   console.log("Converted productId:", productId, typeof productId);
 
   if (!mongoose.Types.ObjectId.isValid(productId)) {

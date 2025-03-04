@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGetAllProductsQuery } from '../../redux/api/productApiSlice';
-import ProductCard from './ProductCards.jsx';
+import ProductCard from './ProductCard.jsx';
 import ProductFilter from './ProductFilter.jsx';
 import ProductSearch from './ProductSearch.jsx';
 import './ProductListPage.css'; // Import the CSS file
@@ -8,7 +8,9 @@ import './ProductListPage.css'; // Import the CSS file
 const ProductListPage = () => {
   const [filters, setFilters] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
-  const { data: products, error, isLoading } = useGetAllProductsQuery({ ...filters, search: searchTerm });
+  const { data, error, isLoading } = useGetAllProductsQuery({ ...filters, search: searchTerm });
+  const products = data?.products || [];  // Handle cases where data is undefined
+  
 
   const handleFilter = (filterValues) => {
     setFilters(filterValues);

@@ -13,7 +13,7 @@ const ProductDetailPage = () => {
 
   return (
     <div className="product-detail-page">
-      <img src={product.images[0]} alt={product.name} />
+<img src={product?.images?.[0] || '/placeholder.jpg'} alt={product?.name || 'Product'} />
       <h1>{product.name}</h1>
       <p>{product.description}</p>
       <p>{product.price}</p>
