@@ -167,11 +167,18 @@ import { Product } from '../models/product.model.js';
 import { Category } from '../models/category.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
+<<<<<<< HEAD
 
 const createProduct = asyncHandler(async (req, res) => {
   const { description, price, category, name, stock, brand } = req.body;
   const images = req.files; // Multer stores files in `req.files`
 
+=======
+//testing fazil
+/*const createProduct = asyncHandler(async (req, res) => {
+  const { description, price, category, name,stock, brand } = req.body;
+const {images}= req.files;
+>>>>>>> 035c4fbbfd3668fca5f4c0192c9cc69b9f571b36
   try {
     // 1. Validate Required Fields
     if (!name) return res.status(400).json({ message: "Name is required" });
@@ -221,26 +228,90 @@ const createProduct = asyncHandler(async (req, res) => {
       error: error.message,
     });
   }
+});*/
+
+const createProduct = asyncHandler(async (req, res) => {
+  const { description, price, category, name, stock, brand } = req.body;
+  const images = req.files; // Multer stores files in `req.files`
+
+  try {
+    // 1. Validate Required Fields
+    if (!name) return res.status(400).json({ message: "Name is required" });
+    if (!price) return res.status(400).json({ message: "Price is required" });
+    if (!category) return res.status(400).json({ message: "Category is required" });
+    if (!images || images.length === 0) return res.status(400).json({ message: "Images are required" });
+
+    // 2. Validate Category Existence
+    const categoryExists = await Category.findById(category);
+    if (!categoryExists) {
+      return res.status(400).json({ message: "Invalid category" });
+    }
+
+    // 3. Upload Images to Cloudinary
+    const uploadedImages = [];
+    
+    for (const file of images) {
+      const uploadedImage = await uploadOnCloudinary(file.path);
+      if (!uploadedImage?.secure_url) {
+        return res.status(500).json({ message: "Failed to upload images" });
+      }
+      uploadedImages.push(uploadedImage.secure_url);
+    }
+
+    // 4. Create the Product
+    const newProduct = new Product({
+      name,
+      description,
+      price,
+      images: uploadedImages, // Store Cloudinary URLs
+      category,
+      stock,
+      brand,
+    });
+
+    await newProduct.save();
+
+    // 5. Response
+    res.status(201).json({
+      message: "Product created successfully",
+      product: newProduct,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "An error occurred while creating the product",
+      error: error.message,
+    });
+  }
 });
 
+//testing fazil
+//basic products search
+/*const fetchAllProducts = asyncHandler(async (req, res) => {
+  try {
+    const products = await Product.find({})
+      .populate("category")
+      .limit(12)
+      .sort({ createAt: -1 });
+
+    res.json(products);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server Error" });
+  }
+});*/
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
     const { category, minPrice, maxPrice, search, sort, page = 1, limit = 10 } = req.query;
 
-    // Initialize filters
     const filter = {};
 
-    // 1. Filter by Category
     if (category) filter.category = category;
-
-    // 2. Filter by Price Range
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = parseFloat(minPrice);
       if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
     }
-
-    // 3. Search by Name or Description
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -248,22 +319,22 @@ const getAllProducts = asyncHandler(async (req, res) => {
       ];
     }
 
-    // 4. Define Sorting
     const sortOptions = sort ? { [sort]: 1 } : { createdAt: -1 };
-
-    // 5. Pagination Logic
     const paginationLimit = parseInt(limit, 10);
     const skip = (parseInt(page, 10) - 1) * paginationLimit;
 
-    // 6. Query the Database
     const products = await Product.find(filter)
-      .populate("category", "name") // Populate category details
+      .populate("category", "name")
       .sort(sortOptions)
-      .skip(skip) // For pagination
+      .skip(skip)
       .limit(paginationLimit);
 
+<<<<<<< HEAD
     // Response
     res.status(200).json(products); // Return only the array of products
+=======
+    res.status(200).json(products); // Now returns only an array
+>>>>>>> 035c4fbbfd3668fca5f4c0192c9cc69b9f571b36
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred while fetching products", error: error.message });
