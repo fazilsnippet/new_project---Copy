@@ -180,3 +180,179 @@ const clearCart = asyncHandler(async (req, res) => {
 });
 
 export { addToCart, getCart, updateCartItem, removeCartItem, clearCart };
+
+//try this.
+/*import mongoose from "mongoose";
+import { Cart } from "../models/cart.model.js";
+import { Product } from "../models/product.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { isValidObjectId } from "../utils/helpers.js";
+
+// 1. Add Item to Cart (Efficient Querying)
+const addToCart = asyncHandler(async (req, res) => {
+  const { userId } = req.user;
+  const { productId, quantity } = req.body;
+
+  if (!isValidObjectId(productId)) {
+    return res.status(400).json({ message: "Invalid product ID" });
+  }
+
+  const product = await Product.findById(productId).select("price stock");
+
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+
+  if (product.stock < quantity) {
+    return res.status(400).json({ message: `Only ${product.stock} units available` });
+  }
+
+  const cart = await Cart.findOneAndUpdate(
+    { user: userId, "items.product": productId },
+    { $inc: { "items.$.quantity": quantity, totalPrice: product.price * quantity } },
+    { new: true }
+  );
+
+  if (!cart) {
+    // If product is not in cart, push a new entry
+    const newCart = await Cart.findOneAndUpdate(
+      { user: userId },
+      {
+        $push: { items: { product: productId, quantity } },
+        $inc: { totalPrice: product.price * quantity },
+      },
+      { upsert: true, new: true }
+    );
+    return res.status(200).json({ message: "Item added to cart", cart: newCart });
+  }
+
+  res.status(200).json({ message: "Item quantity updated", cart });
+});
+
+// 2. Get Cart with Aggregation (Single Query Optimization)
+const getCart = asyncHandler(async (req, res) => {
+  const { userId } = req.user;
+
+  const cart = await Cart.aggregate([
+    { $match: { user: new mongoose.Types.ObjectId(userId) } },
+    {
+      $lookup: {
+        from: "products",
+        localField: "items.product",
+        foreignField: "_id",
+        as: "productDetails",
+      },
+    },
+    {
+      $addFields: {
+        items: {
+          $map: {
+            input: "$items",
+            as: "item",
+            in: {
+              product: {
+                $arrayElemAt: [
+                  {
+                    $filter: {
+                      input: "$productDetails",
+                      as: "prod",
+                      cond: { $eq: ["$$prod._id", "$$item.product"] },
+                    },
+                  },
+                  0,
+                ],
+              },
+              quantity: "$$item.quantity",
+            },
+          },
+        },
+      },
+    },
+    { $project: { productDetails: 0 } },
+  ]);
+
+  if (!cart.length) {
+    return res.status(200).json({ cart: { items: [], totalPrice: 0 } });
+  }
+
+  res.status(200).json({ cart: cart[0] });
+});
+
+// 3. Update Cart Item Quantity
+const updateCartItem = asyncHandler(async (req, res) => {
+  const { userId } = req.user;
+  const { productId, quantity } = req.body;
+
+  if (!isValidObjectId(productId)) {
+    return res.status(400).json({ message: "Invalid product ID" });
+  }
+
+  if (quantity < 1) {
+    return res.status(400).json({ message: "Quantity must be at least 1" });
+  }
+
+  const product = await Product.findById(productId).select("price stock");
+
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+
+  if (product.stock < quantity) {
+    return res.status(400).json({ message: `Only ${product.stock} units available` });
+  }
+
+  const cart = await Cart.findOneAndUpdate(
+    { user: userId, "items.product": productId },
+    { $set: { "items.$.quantity": quantity } },
+    { new: true }
+  );
+
+  if (!cart) {
+    return res.status(404).json({ message: "Cart not found or product not in cart" });
+  }
+
+  res.status(200).json({ message: "Cart updated successfully", cart });
+});
+
+// 4. Remove Item from Cart
+const removeCartItem = asyncHandler(async (req, res) => {
+  const { userId } = req.user;
+  const { productId } = req.body;
+
+  if (!isValidObjectId(productId)) {
+    return res.status(400).json({ message: "Invalid product ID" });
+  }
+
+  const cart = await Cart.findOneAndUpdate(
+    { user: userId },
+    {
+      $pull: { items: { product: productId } },
+    },
+    { new: true }
+  );
+
+  if (!cart) {
+    return res.status(404).json({ message: "Cart not found" });
+  }
+
+  res.status(200).json({ message: "Item removed from cart", cart });
+});
+
+// 5. Clear Cart
+const clearCart = asyncHandler(async (req, res) => {
+  const { userId } = req.user;
+
+  const cart = await Cart.findOneAndUpdate(
+    { user: userId },
+    { items: [], totalPrice: 0 },
+    { new: true }
+  );
+
+  if (!cart) {
+    return res.status(404).json({ message: "Cart not found" });
+  }
+
+  res.status(200).json({ message: "Cart cleared successfully" });
+});
+
+export { addToCart, getCart, updateCartItem, removeCartItem, clearCart };*/
