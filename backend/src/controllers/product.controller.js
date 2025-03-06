@@ -329,7 +329,6 @@ const getAllProducts = asyncHandler(async (req, res) => {
     res.status(200).json(products); // Return only the array of products
 
     res.status(200).json(products); // Now returns only an array
->>>>>>> 035c4fbbfd3668fca5f4c0192c9cc69b9f571b36
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred while fetching products", error: error.message });
