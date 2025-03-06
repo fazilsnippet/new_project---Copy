@@ -167,13 +167,8 @@ import { Product } from '../models/product.model.js';
 import { Category } from '../models/category.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
-<<<<<<< HEAD
 
-const createProduct = asyncHandler(async (req, res) => {
-  const { description, price, category, name, stock, brand } = req.body;
-  const images = req.files; // Multer stores files in `req.files`
 
-=======
 //testing fazil
 /*const createProduct = asyncHandler(async (req, res) => {
   const { description, price, category, name,stock, brand } = req.body;
