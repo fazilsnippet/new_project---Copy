@@ -325,9 +325,6 @@ const getAllProducts = asyncHandler(async (req, res) => {
       .limit(paginationLimit);
 
 
-    // Response
-    res.status(200).json(products); // Return only the array of products
-
     res.status(200).json(products); // Now returns only an array
   } catch (error) {
     console.error(error);
