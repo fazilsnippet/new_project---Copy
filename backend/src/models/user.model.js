@@ -106,7 +106,7 @@ userSchema.methods.generateRefreshToken = function () {
 // Generate Password Reset Token
 userSchema.methods.generatePasswordResetToken = function () {
   const resetToken = jwt.sign(
-    { _id: this._id },
+    { id: this._id.toString() },
     process.env.RESET_TOKEN_SECRET || "reset_secret",
     { expiresIn: "1h" }
   );
