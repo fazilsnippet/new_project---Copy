@@ -1,25 +1,4 @@
-// import { configureStore } from "@reduxjs/toolkit";
-// import { apiSlice } from "./api/apiSlice";
-// import { productSlice } from "./api/productApiSlice";
-// import { orderSlice } from "./api/orderApiSlice";
-// import { userSlice } from "./api/userApiSlice";
-// import { categorySlice } from "./api/categoryApiSlice";
-// import { cartSlice } from "./api/cartApiSlice";
 
-// const store = configureStore({
-//   reducer: {
-//     [apiSlice.reducerPath]: apiSlice.reducer,
-//     [productSlice.reducerPath]: productSlice.reducer,
-//     [orderSlice.reducerPath]: orderSlice.reducer,
-//     [userSlice.reducerPath]: userSlice.reducer,
-//     [categorySlice.reducerPath]: categorySlice.reducer,
-//     [cartSlice.reducerPath]: cartSlice.reducer,
-//   },
-//   middleware: (getDefaultMiddleware) =>
-//     getDefaultMiddleware().concat(apiSlice.middleware),
-// });
-
-// export default store;
 
 import { configureStore } from '@reduxjs/toolkit';
 import { apiSlice } from './api/apiSlice'; // Import the base apiSlice (for baseQuery setup)

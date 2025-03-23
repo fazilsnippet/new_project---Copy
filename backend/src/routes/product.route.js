@@ -15,8 +15,10 @@ const productRouter = express.Router();
 productRouter.post("/", upload.array('images', 5), verifyJWT, createProduct);
 productRouter.get("/", getAllProducts);
 productRouter.get("/:productId", getProductById)
-productRouter.put("/:productId", verifyJWT, updateProduct);
+// productRouter.put("/:productId", verifyJWT, updateProduct);
 productRouter.delete("/:productId", verifyJWT, deleteProduct);
 productRouter.post("/:productId/review", verifyJWT, addReview);
+productRouter.put("/:productId", upload.array("images"), updateProduct);
+
 
 export default productRouter;

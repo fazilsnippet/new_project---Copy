@@ -16,3 +16,4 @@ export const findCartByUser = async (userId) => {
     throw new Error("Error finding the cart for the user");
   }
 };
+

@@ -6,7 +6,8 @@ import {
   refreshAccessToken,
   changeCurrentPassword,
   updateAccountDetails,
-handlePasswordReset
+handlePasswordReset,
+userProfile
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";  // Assuming you have an auth middleware to verify JWT token
 
@@ -22,7 +23,7 @@ userRouter.post("/refresh-token", refreshAccessToken);  // Refresh access token
 
 userRouter.put("/change-password", verifyJWT, changeCurrentPassword);  // Change password
 userRouter.put("/update-account", verifyJWT, updateAccountDetails);  // Update user account details
-
+userRouter.get("/profile", verifyJWT, userProfile);  // Get user profile
 // Reset Password (Through a token from forgot-password)
 userRouter.post("/reset-password", handlePasswordReset);  // Reset password
 

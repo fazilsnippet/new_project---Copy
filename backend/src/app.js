@@ -17,7 +17,12 @@ dotenv.config();  // Load environment variables from .env file
 
 // Initialize the Express app
 const app = express();
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Allow requests from frontend
+    credentials: true, // ✅ Allow cookies to be sent
+  })
+);
 
 // Middleware to parse JSON bodies, cookies, and handle CORS
 // app.use(cors({

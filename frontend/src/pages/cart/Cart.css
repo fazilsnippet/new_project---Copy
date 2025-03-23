@@ -1,0 +1,32 @@
+.cart {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cart h2 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.cart-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.cart-footer button {
+  padding: 8px 15px;
+  border: none;
+  background-color: #ff4d4d;
+  color: white;
+  cursor: pointer;
+}
+
+.cart-footer button:hover {
+  background-color: #cc0000;
+}

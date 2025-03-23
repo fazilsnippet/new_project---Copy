@@ -85,22 +85,36 @@ export const userSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-    // Login user (public route)
+    // Login user (public route) testing fazil
+    // loginUser: builder.mutation({
+    //   query: (credentials) => ({
+    //     url: `${USERS_URL}/login`, // POST request to login user
+    //     method: 'POST',
+    //     body: credentials, // Send login credentials (email and password)
+    //   }),
+    // }),
     loginUser: builder.mutation({
       query: (credentials) => ({
-        url: `${USERS_URL}/login`, // POST request to login user
-        method: 'POST',
-        body: credentials, // Send login credentials (email and password)
+        url: `${USERS_URL}/login`,
+        method: "POST",
+        body: credentials,
+        credentials: "include", // Ensure cookies are sent
       }),
+      transformResponse: (response) => {
+        console.log("Login Response:", response);
+        localStorage.setItem("accessToken", response.accessToken);
+        return response;
+      },
     }),
+    
 
     // Logout user (protected route)
     logoutUser: builder.mutation({
       query: () => ({
-        url: `${USERS_URL}/logout`, // POST request to logout
+        url: `${USERS_URL}/logout`, 
         method: 'POST',
       }),
-      // Ideally, you'd invalidate or clear user-specific data after logout
+      
     }),
 
     // Refresh access token (public route)
@@ -137,7 +151,7 @@ export const userSlice = apiSlice.injectEndpoints({
         body: resetData, // Send reset token and new password
       }),
     }),
-
+ 
     // Fetch user profile (protected route)
     fetchUserProfile: builder.query({
       query: () => ({
@@ -146,6 +160,7 @@ export const userSlice = apiSlice.injectEndpoints({
       }),
       providesTags: ['User'],
     }),
+    
   }),
 });
 

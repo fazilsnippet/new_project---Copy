@@ -40,11 +40,10 @@
 import React from 'react';
 import {useGetAllProductsQuery} from '../redux/api/productApiSlice'
 import { Link } from 'react-router-dom';
-import Header from '../components/header';
+import MainHeader from '../components/mainHeader.jsx';
 import Loader from '../components/Loader';
 import Message from '../components/message';
 import ProductCard from './Products/ProductCard.jsx';
-import Products from './Products/products.jsx'; // Import the Products component
 import './home.css'; // Import the CSS file
 
 const Home = () => {
@@ -53,7 +52,7 @@ const Home = () => {
 
   return (
     <>
-      <Header /> {/* Always display header */}
+      <MainHeader /> 
       {isLoading ? (
         <Loader />
       ) : error ? (
@@ -61,7 +60,6 @@ const Home = () => {
       ) : (
         <div className="home-page">
           <h1>Special Products</h1>
-          <Products/>
           <Link to="/products" className="shop-link">Shop</Link>
           <div className="product-list">
             {Array.isArray(products) && products.map((product) => (

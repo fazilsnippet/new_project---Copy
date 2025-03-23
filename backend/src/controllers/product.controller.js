@@ -167,13 +167,11 @@ import { Product } from '../models/product.model.js';
 import { Category } from '../models/category.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
-<<<<<<< HEAD
 
-const createProduct = asyncHandler(async (req, res) => {
-  const { description, price, category, name, stock, brand } = req.body;
-  const images = req.files; // Multer stores files in `req.files`
+// const createProduct = asyncHandler(async (req, res) => {
+//   const { description, price, category, name, stock, brand } = req.body;
+//   const images = req.files; // Multer stores files in `req.files`
 
-=======
 //testing fazil
 /*const createProduct = asyncHandler(async (req, res) => {
   const { description, price, category, name,stock, brand } = req.body;
@@ -285,21 +283,7 @@ const createProduct = asyncHandler(async (req, res) => {
   }
 });
 
-//testing fazil
-//basic products search
-/*const fetchAllProducts = asyncHandler(async (req, res) => {
-  try {
-    const products = await Product.find({})
-      .populate("category")
-      .limit(12)
-      .sort({ createAt: -1 });
 
-    res.json(products);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server Error" });
-  }
-});*/
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
     const { category, minPrice, maxPrice, search, sort, page = 1, limit = 10 } = req.query;
@@ -329,12 +313,8 @@ const getAllProducts = asyncHandler(async (req, res) => {
       .skip(skip)
       .limit(paginationLimit);
 
-<<<<<<< HEAD
     // Response
-    res.status(200).json(products); // Return only the array of products
-=======
-    res.status(200).json(products); // Now returns only an array
->>>>>>> 035c4fbbfd3668fca5f4c0192c9cc69b9f571b36
+  res.status(200).json(products); // Now returns only an array
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred while fetching products", error: error.message });
@@ -363,23 +343,58 @@ const getProductById = asyncHandler(async (req, res) => {
   res.status(200).json(product);
 });
 
+import fs from "fs";
+
 const updateProduct = asyncHandler(async (req, res) => {
-  const { name, description, price, images, category, stock } = req.body;
+  const { name, description, price, category, stock } = req.body;
 
   if (!name || !price || !category) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
+  let images = req.body.images?.length ? req.body.images : []; // Keep old images if provided
+
+  // If new images are uploaded, process them
+  if (req.files?.length) {
+    try {
+      const uploadedImages = await Promise.all(
+        req.files.map(async (file) => {
+          const uploadedFile = await uploadOnCloudinary(file.path);
+          
+          // Delete the file from public/uploads after successful upload
+          fs.unlink(file.path, (err) => {
+            if (err) console.error(`Failed to delete local file: ${file.path}`, err);
+          });
+
+          return uploadedFile?.secure_url; // Get Cloudinary image URL
+        })
+      );
+
+      images = [...images, ...uploadedImages.filter(Boolean)]; // Merge old and new images
+    } catch (error) {
+      return res.status(500).json({ message: "Image upload failed" });
+    }
+  }
+
+  // Update product in MongoDB
   const updatedProduct = await Product.findByIdAndUpdate(
     req.params.productId,
     { name, description, price, images, category, stock },
-    { new: true } // Return updated document
+    { new: true }
   );
 
-  if (!updatedProduct) return res.status(404).json({ message: "Product not found" });
+  if (!updatedProduct) {
+    return res.status(404).json({ message: "Product not found" });
+  }
 
-  res.status(200).json({ message: "Product updated successfully", product: updatedProduct });
+  res.status(200).json({
+    message: "Product updated successfully",
+    product: updatedProduct,
+  });
 });
+
+
+
 
 const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findByIdAndDelete(req.params.productId);
@@ -391,7 +406,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 const addReview = asyncHandler(async (req, res) => {
   const { rating, review } = req.body;
-  const userId = req.user.id; // Ensure user is authenticated
+  const userId = req.user._id; // Ensure user is authenticated
 
   if (rating < 1 || rating > 5) {
     return res.status(400).json({ message: "Rating must be between 1 and 5" });
@@ -419,3 +434,183 @@ const addReview = asyncHandler(async (req, res) => {
 });
 
 export { deleteProduct, updateProduct, createProduct, addReview, getAllProducts, getProductById };
+
+// import asyncHandler from "express-async-handler";
+// import Product from "../models/product.model.js";
+// import Category from "../models/category.model.js";
+// import { uploadOnCloudinary } from "../utils/cloudinary.js";
+// import fs from "fs";
+// import mongoose from "mongoose";
+
+// /**
+//  * @desc Create a new product
+//  */
+// const createProduct = asyncHandler(async (req, res) => {
+//   const { description, price, category, name, stock, brand } = req.body;
+//   const images = req.files; // Multer stores files in `req.files`
+
+//   // Validate required fields
+//   if (!name || !price || !category || !images?.length) {
+//     return res.status(400).json({ message: "Missing required fields" });
+//   }
+
+//   // Validate category
+//   const categoryExists = await Category.findById(category);
+//   if (!categoryExists) {
+//     return res.status(400).json({ message: "Invalid category" });
+//   }
+
+//   // Upload images to Cloudinary
+//   const uploadedImages = await Promise.all(
+//     images.map(async (file) => {
+//       const uploadedFile = await uploadOnCloudinary(file.path);
+//       fs.unlinkSync(file.path); // Delete temp file
+//       return uploadedFile?.secure_url;
+//     })
+//   );
+
+//   // Create product
+//   const newProduct = new Product({
+//     name,
+//     description,
+//     price,
+//     images: uploadedImages.filter(Boolean), // Ensure no null values
+//     category,
+//     stock,
+//     brand,
+//   });
+
+//   await newProduct.save();
+//   res.status(201).json({ message: "Product created successfully", product: newProduct });
+// });
+
+// /**
+//  * @desc Get all products with filters
+//  */
+// const getAllProducts = asyncHandler(async (req, res) => {
+//   const { category, minPrice, maxPrice, search, sort, page = 1, limit = 10 } = req.query;
+//   const filter = {};
+
+//   if (category) filter.category = category;
+//   if (minPrice || maxPrice) {
+//     filter.price = {};
+//     if (minPrice) filter.price.$gte = parseFloat(minPrice);
+//     if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
+//   }
+//   if (search) {
+//     filter.$or = [
+//       { name: { $regex: search, $options: "i" } },
+//       { description: { $regex: search, $options: "i" } },
+//     ];
+//   }
+
+//   const sortOptions = sort ? { [sort]: 1 } : { createdAt: -1 };
+//   const products = await Product.find(filter)
+//     .populate("category", "name") // ✅ Populate category
+//     .sort(sortOptions)
+//     .skip((parseInt(page, 10) - 1) * parseInt(limit, 10))
+//     .limit(parseInt(limit, 10));
+
+//   res.status(200).json(products);
+// });
+
+// /**
+//  * @desc Get product by ID
+//  */
+// const getProductById = asyncHandler(async (req, res) => {
+//   const { productId } = req.params;
+
+//   if (!mongoose.Types.ObjectId.isValid(productId)) {
+//     return res.status(400).json({ message: "Invalid product ID" });
+//   }
+
+//   const product = await Product.findById(productId).populate("category", "name"); // ✅ Populate category
+//   if (!product) return res.status(404).json({ message: "Product not found" });
+
+//   res.status(200).json(product);
+// });
+
+// /**
+//  * @desc Update product
+//  */
+// const updateProduct = asyncHandler(async (req, res) => {
+//   const { name, description, price, category, stock } = req.body;
+//   if (!name || !price || !category) return res.status(400).json({ message: "Missing required fields" });
+
+//   let images = req.body.images?.length ? req.body.images : [];
+
+//   if (req.files?.length) {
+//     try {
+//       // ✅ Delete old images from Cloudinary
+//       const product = await Product.findById(req.params.productId);
+//       if (product?.images?.length) {
+//         for (const imageUrl of product.images) {
+//           const publicId = imageUrl.split("/").pop().split(".")[0]; // Extract Cloudinary public ID
+//           await cloudinary.uploader.destroy(publicId);
+//         }
+//       }
+
+//       // ✅ Upload new images
+//       const uploadedImages = await Promise.all(
+//         req.files.map(async (file) => {
+//           const uploadedFile = await uploadOnCloudinary(file.path);
+//           fs.unlinkSync(file.path); // Delete temp file
+//           return uploadedFile?.secure_url;
+//         })
+//       );
+
+//       images = [...images, ...uploadedImages.filter(Boolean)];
+//     } catch (error) {
+//       return res.status(500).json({ message: "Image upload failed" });
+//     }
+//   }
+
+//   // ✅ Update product
+//   const updatedProduct = await Product.findByIdAndUpdate(
+//     req.params.productId,
+//     { name, description, price, images, category, stock },
+//     { new: true }
+//   );
+
+//   if (!updatedProduct) return res.status(404).json({ message: "Product not found" });
+
+//   res.status(200).json({ message: "Product updated successfully", product: updatedProduct });
+// });
+
+// /**
+//  * @desc Delete product
+//  */
+// const deleteProduct = asyncHandler(async (req, res) => {
+//   const product = await Product.findByIdAndDelete(req.params.productId);
+//   if (!product) return res.status(404).json({ message: "Product not found" });
+
+//   res.status(200).json({ message: "Product deleted successfully" });
+// });
+
+// /**
+//  * @desc Add a review to a product
+//  */
+// const addReview = asyncHandler(async (req, res) => {
+//   const { rating, review } = req.body;
+//   const userId = req.user._id;
+
+//   if (rating < 1 || rating > 5) return res.status(400).json({ message: "Rating must be between 1 and 5" });
+
+//   const product = await Product.findById(req.params.productId);
+//   if (!product) return res.status(404).json({ message: "Product not found" });
+
+//   if (product.ratings.some((r) => r.userId.toString() === userId.toString())) {
+//     return res.status(400).json({ message: "User has already reviewed this product" });
+//   }
+
+//   product.ratings.push({ userId, rating, review });
+
+//   // ✅ Update average rating
+//   const sumRatings = product.ratings.reduce((sum, r) => sum + r.rating, 0);
+//   product.rating = sumRatings / product.ratings.length;
+
+//   await product.save();
+//   res.status(200).json({ message: "Review added successfully", rating: product.rating });
+// });
+
+// export { deleteProduct, updateProduct, createProduct, addReview, getAllProducts, getProductById };
