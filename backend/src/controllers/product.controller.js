@@ -168,9 +168,12 @@ import { Category } from '../models/category.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 
+<<<<<<< HEAD
 // const createProduct = asyncHandler(async (req, res) => {
 //   const { description, price, category, name, stock, brand } = req.body;
 //   const images = req.files; // Multer stores files in `req.files`
+=======
+>>>>>>> b4560e2d5c384c5165b67398656ee0c1d7a78140
 
 //testing fazil
 /*const createProduct = asyncHandler(async (req, res) => {
@@ -313,8 +316,13 @@ const getAllProducts = asyncHandler(async (req, res) => {
       .skip(skip)
       .limit(paginationLimit);
 
+<<<<<<< HEAD
     // Response
   res.status(200).json(products); // Now returns only an array
+=======
+
+    res.status(200).json(products); // Now returns only an array
+>>>>>>> b4560e2d5c384c5165b67398656ee0c1d7a78140
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "An error occurred while fetching products", error: error.message });

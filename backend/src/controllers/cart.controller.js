@@ -285,6 +285,3 @@ const clearCart = asyncHandler(async (req, res) => {
 
 export { addToCart, getCart, updateCartItem, removeCartItem, clearCart };
 
-
-
-

@@ -23,13 +23,25 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
     if (!user) {
       console.log("Decoded token does not match any user");
       throw new ApiError(401, "Invalid access token");
+      
+
+    const user = await User.findById(decodedToken?.id).select("-refreshToken -password");
+    if (!user) {
+      throw new ApiError(401, "Unauthorized request: User not found");
     }
 
     req.user = user;
     next();
-  } catch (error) {
+  } catch (error) 
     console.log("JWT verification failed:", error.message);
     throw new ApiError(401, error?.message || "Invalid access token");
+    if (error.name === "TokenExpiredError") {
+      throw new ApiError(401, "Unauthorized request: Token expired");
+    }
+    if (error.name === "JsonWebTokenError") {
+      throw new ApiError(401, "Unauthorized request: Invalid token");
+    }
+    throw new ApiError(401, error?.message || "Unauthorized request");
   }
 });
 
