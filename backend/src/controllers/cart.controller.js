@@ -68,7 +68,7 @@ const getCart = asyncHandler(async (req, res) => {
     return res.status(200).json({ cart: { items: [], totalPrice: 0 } });
   }
 
-  res.status(200).json({ cart }); // ✅ Return the cart object directly
+  res.status(200).json({ cart }); 
 });
 
 // // 2. Get Cart for User

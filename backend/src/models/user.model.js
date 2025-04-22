@@ -215,17 +215,13 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
-<<<<<<< HEAD
-      id: this._id.toString(), // Ensuring consistency
-=======
       id: this._id.toString(), // Change _id to id
->>>>>>> b4560e2d5c384c5165b67398656ee0c1d7a78140
       email: this.email,
       userName: this.userName,
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "1h",
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "1d",
     }
   );
 };
@@ -234,11 +230,7 @@ userSchema.methods.generateAccessToken = function () {
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
-<<<<<<< HEAD
-      id: this._id.toString(), // Changed from this.id to this._id
-=======
       id: this._id.toString(),
->>>>>>> b4560e2d5c384c5165b67398656ee0c1d7a78140
     },
     process.env.REFRESH_TOKEN_SECRET,
     {

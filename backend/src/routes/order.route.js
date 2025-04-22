@@ -17,12 +17,12 @@ orderRouter.post('/orders', verifyJWT, createOrder);
 orderRouter.get('/orders/user/:userId', verifyJWT, getUserOrders);
 
 // Update order status (protected route)
-orderRouter.put('/orders/:orderId', verifyJWT, admin, updateOrderStatus);
+orderRouter.put('/orders/:orderId', verifyJWT, admin("Admin"), updateOrderStatus);
 
 // Get summary of all orders (e.g., for analytics) (admin route)
-orderRouter.get('/orders/summary', verifyJWT, admin, getOrderSummary);
+orderRouter.get('/orders/summary', verifyJWT, admin("Admin"), getOrderSummary);
 
 // Delete an order (protected route, admin)
-orderRouter.delete('/orders/:orderId', verifyJWT, admin, deleteOrder);
+orderRouter.delete('/orders/:orderId', verifyJWT, admin("Admin"), deleteOrder);
 
 export default orderRouter

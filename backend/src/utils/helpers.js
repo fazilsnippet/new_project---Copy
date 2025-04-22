@@ -16,9 +16,7 @@ export const findCartByUser = async (userId) => {
     throw new Error("Error finding the cart for the user");
   }
 };
-<<<<<<< HEAD
 
-=======
 //try this better approach 
 /*import mongoose from "mongoose";
 import { Cart } from "../models/cart.model.js";
@@ -48,4 +46,3 @@ export const findCartByUser = async (userId) => {
     throw new Error("Failed to retrieve the cart");
   }
 };*/
->>>>>>> b4560e2d5c384c5165b67398656ee0c1d7a78140

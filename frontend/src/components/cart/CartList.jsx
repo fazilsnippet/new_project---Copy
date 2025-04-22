@@ -8,7 +8,6 @@ const CartList = () => {
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Error fetching cart items.</p>;
 
-  // ✅ Ensure correct data structure
   const cart = data?.cart ?? { items: [] };
 
   return (

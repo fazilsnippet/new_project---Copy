@@ -9,7 +9,7 @@ import {
   deleteCategory,
 } from "../controllers/category.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js"; // JWT authentication middleware
-import { upload } from "../middlewares/multer.js"; // Import multer middleware
+import { upload } from "../middleware/multer.middleware.js"; // Import multer middleware
 
 const categoryRouter = express.Router();
 

@@ -7,7 +7,8 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/home"; // Example Home Page
 import ProductListPage from "./pages/Products/ProductListPage.jsx";
-import CartPage from "./components/cart/CartPage.jsx"
+// import CartPage from "./components/cart/CartPage.jsx"
+import CartPage from "./pages/cart/cartpage.jsx";
 function App() {
   return (
     <Router>
