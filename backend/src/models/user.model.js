@@ -178,7 +178,6 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: false,
       match: [/^\+?[0-9]{10,15}$/, "Please provide a valid phone number"],
     },
     isAdmin: {
