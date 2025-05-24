@@ -117,7 +117,7 @@ export const generateAccessTokenAndRefreshToken = async (userId) => {
     const logoutUser = asyncHandler(async (req, res) => {
       await User.findOneAndUpdate(
 
-        req.user._id,
+        {id:req.user._id},
         {
           $unset: { refreshToken: 1 },
         },
