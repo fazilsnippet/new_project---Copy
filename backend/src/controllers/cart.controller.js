@@ -2,7 +2,6 @@ import { Cart } from "../models/cart.model.js";
 import { Product } from "../models/product.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { findCartByUser, isValidObjectId } from "../utils/helpers.js"; 
-import mongoose from "mongoose";
 
 
 const addToCart = asyncHandler(async (req, res) => {

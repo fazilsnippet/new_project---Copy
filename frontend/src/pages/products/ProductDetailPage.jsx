@@ -95,7 +95,7 @@ import { useGetProductByIdQuery } from "../../redux/api/productApiSlice";
 import CartList from "../../components/cart/CartList.jsx";
 import AddToCart from "../../components/cart/AddToCart.jsx";
 import "./ProductDetailPage.css"; // Import the CSS file
-
+import PaymentComponent from "../payment/payment.jsx"; // Import the Payment component
 const ProductDetailPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -127,7 +127,8 @@ const ProductDetailPage = () => {
 
   // Navigate to Payment with Product Data
   const handleBuyNow = () => {
-    navigate("/payment", { state: { product } });
+    navigate("/payments", { state: { product } })
+    
   };
 
   return (

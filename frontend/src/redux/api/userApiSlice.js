@@ -1,79 +1,105 @@
-// import { apiSlice } from "./apiSlice.js";
-// import { USERS_URL } from "../constants.jsx";
 
-// export const userApiSlice = apiSlice.injectEndpoints({
+
+// // userSlice.js
+// import { apiSlice } from './apiSlice'; // Import the base apiSlice setup
+// import {USERS_URL} from '../constants'
+// export const userSlice = apiSlice.injectEndpoints({
 //   endpoints: (builder) => ({
-//     login: builder.mutation({
-//       query: (data) => ({
-//         url: `${USERS_URL}/auth`,
-//         method: "POST",
-//         body: data,
+//     // Register user (public route)
+//     registerUser: builder.mutation({
+//       query: (userData) => ({
+//         url: `${USERS_URL}/register`, // POST request to register a new user
+//         method: 'POST',
+//         body: userData, // Send user registration data
 //       }),
 //     }),
-//     register: builder.mutation({
-//       query: (data) => ({
-//         url: `${USERS_URL}`,
+
+   
+//     loginUser: builder.mutation({
+//       query: (credentials) => ({
+//         url: `${USERS_URL}/login`,
 //         method: "POST",
-//         body: data,
+//         body: credentials,
+//         credentials: "include", // Ensure cookies are sent
 //       }),
+//       transformResponse: (response) => {
+//         console.log("Login Response:", response);
+//         localStorage.setItem("accessToken", response.accessToken);
+//         return response;
+//       },
 //     }),
-//     logout: builder.mutation({
+    
+
+//     // Logout user (protected route)
+//     logoutUser: builder.mutation({
 //       query: () => ({
-//         url: `${USERS_URL}/logout`,
-//         method: "POST",
+//         url: `${USERS_URL}/logout`, 
+//         method: 'POST',
 //       }),
+      
 //     }),
-//     profile: builder.mutation({
-//       query: (data) => ({
-//         url: `${USERS_URL}/profile`,
-//         method: "PUT",
-//         body: data,
-//       }),
-//     }),
-//     getUsers: builder.query({
+
+//     // Refresh access token (public route)
+//     refreshToken: builder.mutation({
 //       query: () => ({
-//         url: USERS_URL,
-//       }),
-//       providesTags: ["User"],
-//       keepUnusedDataFor: 5,
-//     }),
-//     deleteUser: builder.mutation({
-//       query: (userId) => ({
-//         url: `${USERS_URL}/${userId}`,
-//         method: "DELETE",
+//         url: `${USERS_URL}/refresh-token`, // POST request to refresh access token
+//         method: 'POST',
 //       }),
 //     }),
-//     getUserDetails: builder.query({
-//       query: (id) => ({
-//         url: `${USERS_URL}/${id}`,
+
+//     // Change password (protected route)
+//     changePassword: builder.mutation({
+//       query: (passwordData) => ({
+//         url: `${USERS_URL}/change-password`, // PUT request to change password
+//         method: 'PUT',
+//         body: passwordData, // Send current and new password details
 //       }),
-//       keepUnusedDataFor: 5,
 //     }),
-//     updateUser: builder.mutation({
-//       query: (data) => ({
-//         url: `${USERS_URL}/${data.userId}`,
-//         method: "PUT",
-//         body: data,
+
+//     // Update account details (protected route)
+//     updateAccount: builder.mutation({
+//       query: (updateData) => ({
+//         url: `${USERS_URL}/update-account`, // PUT request to update user account
+//         method: 'PUT',
+//         body: updateData, // Send updated account details (e.g., userName, fullName, address, phone)
 //       }),
-//       invalidatesTags: ["User"],
 //     }),
+
+//     // Reset password (public route)
+//     resetPassword: builder.mutation({
+//       query: (resetData) => ({
+//         url: `${USERS_URL}/reset-password`, // POST request to reset password
+//         method: 'POST',
+//         body: resetData, // Send reset token and new password
+//       }),
+//     }),
+ 
+//     // Fetch user profile (protected route)
+//     fetchUserProfile: builder.query({
+//       query: () => ({
+//         url: `${USERS_URL}/profile`, // GET request to fetch the logged-in user's profile
+//         method: 'GET',
+//       }),
+//       providesTags: ['User'],
+//     }),
+    
 //   }),
 // });
 
 // export const {
-//   useLoginMutation,
-//   useLogoutMutation,
-//   useRegisterMutation,
-//   useProfileMutation,
-//   useGetUsersQuery,
-//   useDeleteUserMutation,
-//   useUpdateUserMutation,
-//   useGetUserDetailsQuery,
-// } = userApiSlice;
+//   useRegisterUserMutation,
+//   useLoginUserMutation,
+//   useLogoutUserMutation,
+//   useRefreshTokenMutation,
+//   useChangePasswordMutation,
+//   useUpdateAccountMutation,
+//   useResetPasswordMutation,
+//   useFetchUserProfileQuery,
+// } = userSlice;
 
-// userSlice.js
-import { apiSlice } from './apiSlice'; // Import the base apiSlice setup
-import {USERS_URL} from '../constants'
+import { apiSlice } from './apiSlice';  // Import the base apiSlice setup
+import { USERS_URL } from '../constants'; // Ensure this is the correct path for your URL constants
+
 export const userSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Register user (public route)
@@ -85,36 +111,33 @@ export const userSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-    // Login user (public route) testing fazil
-    // loginUser: builder.mutation({
-    //   query: (credentials) => ({
-    //     url: `${USERS_URL}/login`, // POST request to login user
-    //     method: 'POST',
-    //     body: credentials, // Send login credentials (email and password)
-    //   }),
-    // }),
+    // Login user (public route)
     loginUser: builder.mutation({
       query: (credentials) => ({
         url: `${USERS_URL}/login`,
-        method: "POST",
+        method: 'POST',
         body: credentials,
-        credentials: "include", // Ensure cookies are sent
+        credentials: 'include', // Ensure cookies are sent (if used for JWT)
       }),
       transformResponse: (response) => {
         console.log("Login Response:", response);
-        localStorage.setItem("accessToken", response.accessToken);
+        // Store the access token in localStorage for further requests
+        localStorage.setItem("token", response.accessToken);  // Store the token under 'token'
         return response;
       },
     }),
-    
 
     // Logout user (protected route)
     logoutUser: builder.mutation({
       query: () => ({
-        url: `${USERS_URL}/logout`, 
+        url: `${USERS_URL}/logout`,
         method: 'POST',
       }),
-      
+      // Optionally clear localStorage or cookies here when the user logs out
+      transformResponse: () => {
+        localStorage.removeItem("token");  // Clear token on logout
+        return null;
+      },
     }),
 
     // Refresh access token (public route)
@@ -151,17 +174,18 @@ export const userSlice = apiSlice.injectEndpoints({
         body: resetData, // Send reset token and new password
       }),
     }),
- 
+
     // Fetch user profile (protected route)
     fetchUserProfile: builder.query({
       query: () => ({
         url: `${USERS_URL}/profile`, // GET request to fetch the logged-in user's profile
         method: 'GET',
       }),
-      providesTags: ['User'],
+      providesTags: ['User'], // Cache the user data under 'User' tag
     }),
-    
   }),
+
+  
 });
 
 export const {

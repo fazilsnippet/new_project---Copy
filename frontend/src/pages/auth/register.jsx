@@ -46,6 +46,8 @@ const Register = () => {
     try {
       const res = await register({ fullName, userName, email, password }).unwrap();
       dispatch(setCredentials({ ...res }));
+      localStorage.setItem("token", res.accessToken); // After successful registration
+
       navigate(redirect);
       toast.success("User successfully registered");
     } catch (err) {
@@ -119,7 +121,7 @@ const Register = () => {
               <p>
                 Already have an account? {" "}
                 <Link to={redirect ? `/login?redirect=${redirect}` : "/login"} className="login-link">
-                  Login
+                Login
                 </Link>
               </p>
             </div>

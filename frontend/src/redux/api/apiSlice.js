@@ -1,67 +1,31 @@
-// import { BASE_URL } from "../constants";
-// import {fetchBaseQuery, createApi} from "@reduxjs/toolkit/query/react"
-
-// const baseQuery = fetchBaseQuery({ baseUrl: BASE_URL });
-
-// export const apiSlice = createApi({
-//   baseQuery,
-//   credentials: "include",
-//   tagTypes: ["Product", "Order", "User", "Category","Cart","Wishlist"],
-//   endpoints: () => ({}),
-// });
-
-import { BASE_URL } from "../constants";
-import { fetchBaseQuery, createApi } from "@reduxjs/toolkit/query/react";
-
-const baseQuery = fetchBaseQuery({
-  baseUrl: BASE_URL,
-  credentials: "include", // 👈 Ensures cookies are sent with requests
-});
-
-export const apiSlice = createApi({
-  baseQuery,
-  tagTypes: ["Product", "Order", "User", "Category", "Cart", "Wishlist"],
-  endpoints: () => ({}),
-});
 
 
-// import { fetchBaseQuery, createApi } from "@reduxjs/toolkit/query/react";
-// import { BASE_URL } from "../constants";
-// import { logout, setCredentials } from "../features/auth/authSlice";
+// import { BASE_URL } from '../constants';
+// import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 // const baseQuery = fetchBaseQuery({
 //   baseUrl: BASE_URL,
-//   credentials: "include",
-//   prepareHeaders: (headers, { getState }) => {
-//     const token = localStorage.getItem("accessToken");
-
+//   prepareHeaders: (headers) => {
+//     const token = localStorage.getItem('token');
 //     if (token) {
-//       headers.set("Authorization", `Bearer ${token}`);
+//       headers.set('Authorization', `Bearer ${token}`);
 //     }
-
 //     return headers;
 //   },
+//   credentials: 'include',
 // });
 
 // const baseQueryWithReauth = async (args, api, extraOptions) => {
 //   let result = await baseQuery(args, api, extraOptions);
 
-//   if (result?.error?.status === 401) {
-//     // Token expired, attempt refresh
-//     const refreshResult = await baseQuery(
-//       { url: "/users/refresh-token", method: "POST" },
-//       api,
-//       extraOptions
-//     );
+//   if (result?.error?.status === 401 || result?.error?.status === 403) {
+//     const refreshResult = await baseQuery(`${USERS_URL}/refresh-token`, api, extraOptions);
 
-//     if (refreshResult?.data) {
-//       // Save new tokens
-//       api.dispatch(setCredentials(refreshResult.data));
-
-//       // Retry the original request
+//     if (refreshResult?.data?.accessToken) {
+//       localStorage.setItem('token', refreshResult.data.accessToken);
 //       result = await baseQuery(args, api, extraOptions);
 //     } else {
-//       api.dispatch(logout()); // Logout user if refresh fails
+//       api.dispatch(logout());
 //     }
 //   }
 
@@ -69,7 +33,79 @@ export const apiSlice = createApi({
 // };
 
 // export const apiSlice = createApi({
-//   baseQuery: baseQueryWithReauth, // Use modified baseQuery
-//   tagTypes: ["Product", "Order", "User", "Category", "Cart", "Wishlist"],
+//   baseQuery: baseQueryWithReauth,
+
+//   // baseQuery,
+//   tagTypes: ['Product', 'Payment', 'Order', 'User', 'Category', 'Cart', 'Wishlist'],
 //   endpoints: () => ({}),
 // });
+
+// // import { BASE_URL } from '../constants';
+// // import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+// // import { USERS_URL } from '../constants';
+// // import { logout } from '../features/auth/authSlice';
+
+// // const baseQuery = fetchBaseQuery({
+// //   baseUrl: BASE_URL,
+// //   credentials: 'include', // ✅ send cookies on every request
+// // });
+
+// // const baseQueryWithReauth = async (args, api, extraOptions) => {
+// //   let result = await baseQuery(args, api, extraOptions);
+
+// //   if (result?.error?.status === 401 || result?.error?.status === 403) {
+// //     const refreshResult = await baseQuery(`${USERS_URL}/refresh-token`, api, extraOptions);
+
+// //     if (refreshResult?.data) {
+// //       // No need to store token in localStorage if using cookies
+// //       result = await baseQuery(args, api, extraOptions);
+// //     } else {
+// //       api.dispatch(logout());
+// //     }
+// //   }
+
+// //   return result;
+// // };
+
+// // export const apiSlice = createApi({
+// //   baseQuery: baseQueryWithReauth,
+// //   tagTypes: ['Product', 'Payment', 'Order', 'User', 'Category', 'Cart', 'Wishlist'],
+// //   endpoints: () => ({}),
+// // });
+
+
+
+// import { BASE_URL } from "../constants";
+// import { fetchBaseQuery, createApi } from "@reduxjs/toolkit/query/react";
+
+// const baseQuery = fetchBaseQuery({
+//   baseUrl: BASE_URL,
+//   credentials: "include", // 👈 Ensures cookies are sent with requests
+// });
+
+// export const apiSlice = createApi({
+//   baseQuery,
+//   tagTypes: ["Product", "Payment","Order", "User", "Category", "Cart", "Wishlist"],
+//   endpoints: () => ({}),
+// });
+
+
+import { BASE_URL } from '../constants';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+
+const baseQuery = fetchBaseQuery({
+  baseUrl: BASE_URL,
+  prepareHeaders: (headers) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+    return headers;
+  },
+});
+
+export const apiSlice = createApi({
+  baseQuery,
+  tagTypes: ['Product', 'Payment', 'Order', 'User', 'Category', 'Cart', 'Wishlist'],
+  endpoints: () => ({}),
+});

@@ -1,40 +1,22 @@
 import mongoose from 'mongoose';
 
-const paymentSchema = new mongoose.Schema(
-  {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Reference to the User model
-      required: [true, "Payment must be linked to a user"],
-    },
-    order: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Order", // Reference to the Order model
-      required: [true, "Payment must be linked to an order"],
-    },
-    paymentMethod: {
-      type: String,
-      required: [true, "Payment method is required"],
-      enum: ["Credit Card", "PayPal", "Cash on Delivery"], // Add methods as needed
-    },
-    status: {
-      type: String,
-      enum: ["Pending", "Completed", "Failed"],
-      default: "Pending",
-    },
-    amount: {
-      type: Number,
-      required: [true, "Payment amount is required"],
-    },
-    transactionId: {
-      type: String,
-      unique: true,
-    },
-    paidAt: {
-      type: Date,
-    },
+const paymentSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+  razorpayOrderId: { type: String, required: true },
+  razorpayPaymentId: { type: String, required: true },
+  razorpaySignature: { type: String, required: true },
+  amount: { type: Number, required: true },
+  currency: { type: String, default: 'INR' },
+  method: { type: String }, // e.g. card, netbanking, UPI, etc.
+  status: {
+    type: String,
+    enum: ['created', 'processing', 'captured', 'failed', 'refunded'],
+    default: 'created'
   },
-  { timestamps: true }
-);
+  paymentCapturedAt: { type: Date },
+  notes: { type: mongoose.Schema.Types.Mixed }, // To store any extra Razorpay notes if needed
+  createdAt: { type: Date, default: Date.now }
+});
 
-export const Payment = mongoose.model("Payment", paymentSchema);
+export default mongoose.model('Payment', paymentSchema);

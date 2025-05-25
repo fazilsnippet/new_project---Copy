@@ -1,28 +1,23 @@
 import express from 'express';
-import {
-  createOrder,
-  getUserOrders,
-  updateOrderStatus,
-  getOrderSummary,
-  deleteOrder,
-} from '../controllers/order.controller.js';
-import { verifyJWT, admin } from '../middleware/auth.middleware.js'; // Import authentication and authorization middleware
+import { createOrder, getAllOrders, getOrderById, updateOrderStatus, deleteOrder } from '../controllers/order.controller.js';
+import { verifyJWT } from '../middleware/auth.middleware.js';  // Authentication middleware
 
 const orderRouter = express.Router();
 
-// Create a new order (protected route)
-orderRouter.post('/orders', verifyJWT, createOrder);
+// Route to create a new order
+orderRouter.post('/', verifyJWT, createOrder);  // Protect middleware to ensure user is authenticated
 
-// Get all orders for a specific user (protected route)
-orderRouter.get('/orders/user/:userId', verifyJWT, getUserOrders);
+// Route to get all orders for a user
+orderRouter.get('/:userId', verifyJWT, getAllOrders);
 
-// Update order status (protected route)
-orderRouter.put('/orders/:orderId', verifyJWT, admin("Admin"), updateOrderStatus);
+// Route to get a single order by its ID
+orderRouter.get('/:orderId', verifyJWT, getOrderById);
 
-// Get summary of all orders (e.g., for analytics) (admin route)
-orderRouter.get('/orders/summary', verifyJWT, admin("Admin"), getOrderSummary);
+// Route to update the order status (for example, after payment completion)
+orderRouter.put('/:orderId/status', verifyJWT, updateOrderStatus);
 
-// Delete an order (protected route, admin)
-orderRouter.delete('/orders/:orderId', verifyJWT, admin("Admin"), deleteOrder);
+// Route to delete an order (if needed, e.g., after payment or cancellation)
+orderRouter.delete('/:orderId', verifyJWT, deleteOrder);
 
-export default orderRouter
+export default orderRouter;
+

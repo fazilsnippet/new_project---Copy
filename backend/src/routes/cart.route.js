@@ -25,16 +25,16 @@ import express from "express";
 import { addToCart, getCart, updateCartItem, removeCartItem, clearCart } from "../controllers/cart.controller.js"; 
 import { verifyJWT } from "../middleware/auth.middleware.js"; 
 
-const router = express.Router();
+const cartRouter = express.Router();
 
-router.use(verifyJWT);
+cartRouter.use(verifyJWT);
 
-router.get("/", getCart); 
-router.post("/add", addToCart); 
-router.put("/update", updateCartItem); 
+cartRouter.get("/", getCart); 
+cartRouter.post("/add", addToCart); 
+cartRouter.put("/update", updateCartItem); 
 // router.delete("/remove", removeCartItem);
-router.delete("/remove/:productId", removeCartItem);
+cartRouter.delete("/remove/:productId", removeCartItem);
 
-router.delete("/clear", clearCart); 
+cartRouter.delete("/clear", clearCart); 
 
-export default router;
+export default cartRouter;

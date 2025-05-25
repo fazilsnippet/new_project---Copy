@@ -1,13 +1,15 @@
 import express from "express";
 import {
-  registerUser,
+
+ registerUser,
   loginUser,
   logoutUser,
   refreshAccessToken,
-  changeCurrentPassword,
+   changeCurrentPassword,
   updateAccountDetails,
-handlePasswordReset,
-userProfile
+  // handlePasswordReset,
+  userProfile,
+
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";  // Assuming you have an auth middleware to verify JWT token
 
@@ -25,11 +27,10 @@ userRouter.put("/change-password", verifyJWT, changeCurrentPassword);  // Change
 userRouter.put("/update-account", verifyJWT, updateAccountDetails);  // Update user account details
 userRouter.get("/profile", verifyJWT, userProfile);  // Get user profile
 // Reset Password (Through a token from forgot-password)
-userRouter.post("/reset-password", handlePasswordReset);  // Reset password
+// userRouter.post("/reset-password", handlePasswordReset);  // Reset password
 
 // Route for verifying the OTP
 export default userRouter;
-
 
 
 

@@ -39,7 +39,7 @@
 // export default Home;
 import React from 'react';
 import {useGetAllProductsQuery} from '../redux/api/productApiSlice'
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import MainHeader from '../components/mainHeader.jsx';
 import Loader from '../components/Loader';
 import Message from '../components/message';
@@ -51,7 +51,11 @@ const Home = () => {
   const { data: products, isLoading, error } = useGetAllProductsQuery();
 
   return (
-    <>
+    <> 
+  
+
+      {/* <Header /> */}
+      {/* <MainHeader /> */}
       <MainHeader /> 
       {isLoading ? (
         <Loader />
