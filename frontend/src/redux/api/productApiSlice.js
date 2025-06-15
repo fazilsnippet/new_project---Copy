@@ -76,7 +76,7 @@ import { PRODUCT_URL } from '../constants';
 export const productSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAllProducts: builder.query({
-      query: (params = {}) => { // Ensure params is always an object
+      query: (params = {}) => { 
         const { search = '', filters = {} } = params;
 
         let queryString = new URLSearchParams();
