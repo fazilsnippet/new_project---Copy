@@ -74,6 +74,7 @@ import { apiSlice } from './apiSlice';
 import { PRODUCT_URL } from '../constants';
 export const productSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+<<<<<<< HEAD
 //     getAllProducts: builder.query({
 //       query: (params = {}) => {
 //         const { search = '', filters = {} } = params;
@@ -91,6 +92,11 @@ export const productSlice = apiSlice.injectEndpoints({
 // getAllProducts: builder.query({
 //   query: ({ page = 1, limit = 12, search = '', filters = {} } = {}) => {
 //     const queryString = new URLSearchParams();
+=======
+    getAllProducts: builder.query({
+      query: (params = {}) => { 
+        const { search = '', filters = {} } = params;
+>>>>>>> 3a938804a0b69c468a995ae4442d31accd06bf18
 
 //     if (search) queryString.append('search', search);
 //     Object.entries(filters).forEach(([key, value]) => {
