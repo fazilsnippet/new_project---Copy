@@ -1,36 +1,46 @@
-import { WISHLIST_URL } from '../constants'; // Import the wishlist URL from constants
+// redux/api/wishlistApiSlice.js
+import { WISHLIST_URL } from '../constants';
 import { apiSlice } from './apiSlice';
+
 export const wishlistSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // Fetch advanced wishlist details for a specific user (protected route)
+    // ✅ Get wishlist (supports pagination)
     getAdvancedWishlist: builder.query({
       query: ({ userId, skip = 0, limit = 20 }) => ({
-        url: WISHLIST_URL, 
+        url: WISHLIST_URL,
         method: 'GET',
-        params: { skip, limit }, // Pagination parameters are always included
+        params: { skip, limit }, // Backend already handles this
       }),
-      providesTags: ['Wishlist'], // Tag to invalidate wishlist data when changed
+      providesTags: (result) =>
+        result?.wishlist
+          ? [
+              ...result.wishlist.map((item) => ({ type: 'Wishlist', id: item.productId })),
+              { type: 'Wishlist', id: 'LIST' },
+            ]
+          : [{ type: 'Wishlist', id: 'LIST' }],
     }),
 
-    // Add product to the wishlist (protected route)
+    // ✅ Add product to wishlist
     addProductToWishlist: builder.mutation({
       query: ({ userId, productId }) => ({
-        url: WISHLIST_URL, // POST request to add product to wishlist
+        url: WISHLIST_URL,
         method: 'POST',
-        body: { productId }, // Send productId to add to the wishlist
+        body: { userId, productId },
       }),
-      invalidatesTags: ['Wishlist'], // Invalidate wishlist cache after adding product
+      invalidatesTags: [{ type: 'Wishlist', id: 'LIST' }],
     }),
 
-    // Remove product from wishlist (protected route)
+    // ✅ Remove product from wishlist
     removeProductFromWishlist: builder.mutation({
       query: ({ userId, productId }) => ({
-        url: `${WISHLIST_URL}/${productId}`, // DELETE request to remove product
+        url: `${WISHLIST_URL}/${productId}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Wishlist'], // Invalidate wishlist cache after removal
+      invalidatesTags: (result, error, { productId }) => [
+        { type: 'Wishlist', id: productId },
+        { type: 'Wishlist', id: 'LIST' },
+      ],
     }),
-
   }),
 });
 

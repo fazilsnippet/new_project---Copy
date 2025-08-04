@@ -1,11 +1,11 @@
+// wishlist.controller.js
 import { Wishlist } from '../models/wishlist.model.js';
-
 import { Types } from 'mongoose';
 
-// Helper function to check if ObjectId is valid
+// Helper: Validate MongoDB ObjectId
 const isValidObjectId = (id) => Types.ObjectId.isValid(id);
 
-// Function to get aggregation pipeline for wishlist with optional pagination
+// Aggregation Pipeline for Wishlist
 const getWishlistAggregationPipeline = (userId, skip = 0, limit = 20) => {
   return [
     { $match: { user: userId } },
@@ -21,8 +21,16 @@ const getWishlistAggregationPipeline = (userId, skip = 0, limit = 20) => {
     { $unwind: '$productDetails' },
     {
       $addFields: {
-        'productDetails.averageRating': { $avg: '$productDetails.ratings.rating' },
-        'productDetails.totalRatings': { $size: '$productDetails.ratings' },
+        'productDetails.averageRating': {
+          $cond: [
+            { $gt: [{ $size: { $ifNull: ['$productDetails.ratings', []] } }, 0] },
+            { $avg: '$productDetails.ratings.rating' },
+            0
+          ]
+        },
+        'productDetails.totalRatings': {
+          $size: { $ifNull: ['$productDetails.ratings', []] }
+        },
       },
     },
     {
@@ -67,59 +75,92 @@ const getWishlistAggregationPipeline = (userId, skip = 0, limit = 20) => {
   ];
 };
 
-// Get advanced wishlist details
+
+// 📌 Get Wishlist
 export const getAdvancedWishlist = async (req, res) => {
   try {
-    const userId = req.user._id; // Assuming `req.user` contains the authenticated user's data.
-    
-    if (!userId || !isValidObjectId(userId)) {
-      return res.status(400).json({ message: 'Valid User ID is required.' });
+    const userId = req.user._id;
+    if (!isValidObjectId(userId)) {
+      return res.status(400).json({ success: false, message: 'Invalid User ID.' });
     }
 
-    const { skip = 0, limit = 20 } = req.query; // Pagination: default skip 0, limit 20
+    const skip = parseInt(req.query.skip) || 0;
+    const limit = parseInt(req.query.limit) || 20;
 
-    const wishlist = await Wishlist.aggregate(getWishlistAggregationPipeline(userId, parseInt(skip), parseInt(limit)));
+   const wishlist = await Wishlist.findOne({ user: userId })
+  .populate({
+    path: "items.product",
+    select: "name price images", // Only return needed fields
+  });
 
-    if (!wishlist || wishlist.length === 0) {
-      return res.status(404).json({ message: 'Wishlist not found or empty.' });
-    }
+res.status(200).json({
+  wishlist: wishlist?.items?.map(item => ({
+    productId: item.product._id,
+    name: item.product.name,
+    price: item.product.price,
+    images: item.product.images, // Make sure images is an array
+  })) || []
+});
 
-    res.status(200).json({ wishlist });
   } catch (error) {
-    console.error('Error fetching advanced wishlist:', error);
-    res.status(500).json({ message: 'Server error', error });
+    console.error('Error fetching wishlist:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
 };
 
-// Remove product from wishlist
+// 📌 Add Product to Wishlist
+export const addProductToWishlist = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const userId = req.user._id;
+
+    if (!isValidObjectId(userId) || !isValidObjectId(productId)) {
+      return res.status(400).json({ success: false, message: 'Invalid User or Product ID.' });
+    }
+
+    let wishlist = await Wishlist.findOne({ user: userId });
+    if (!wishlist) {
+      wishlist = new Wishlist({ user: userId, items: [] });
+    }
+
+    const exists = wishlist.items.some((item) => item.product.toString() === productId);
+    if (exists) {
+      return res.status(400).json({ success: false, message: 'Product already in wishlist.' });
+    }
+
+    wishlist.items.push({ product: productId });
+    await wishlist.save();
+
+    res.status(200).json({ success: true, message: 'Product added to wishlist.', wishlist });
+  } catch (error) {
+    console.error('Error adding to wishlist:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+};
+
+// 📌 Remove Product from Wishlist
 export const removeProductFromWishlist = async (req, res) => {
   try {
-    const { productId } = req.params; // Get product ID from URL params
-    const userId = req.user._id; // User ID from authenticated request
+    const { productId } = req.params;
+    const userId = req.user._id;
 
-    // Validate productId and userId
-    if (!productId || !isValidObjectId(productId)) {
-      return res.status(400).json({ message: 'Valid Product ID is required.' });
+    if (!isValidObjectId(userId) || !isValidObjectId(productId)) {
+      return res.status(400).json({ success: false, message: 'Invalid IDs.' });
     }
 
-    if (!userId || !isValidObjectId(userId)) {
-      return res.status(400).json({ message: 'Valid User ID is required.' });
-    }
-
-    // Find the wishlist and remove the item (product) from the `items` array
     const updatedWishlist = await Wishlist.findOneAndUpdate(
-      { user: userId, 'items.product': productId }, // Match the user and the product in the wishlist
-      { $pull: { items: { product: productId } } }, // Remove the item from the array
-      { new: true } // Return the updated wishlist
+      { user: userId },
+      { $pull: { items: { product: productId } } },
+      { new: true }
     );
 
     if (!updatedWishlist) {
-      return res.status(404).json({ message: 'Product not found in wishlist.' });
+      return res.status(404).json({ success: false, message: 'Product not found in wishlist.' });
     }
 
-    res.status(200).json({ message: 'Product removed from wishlist', wishlist: updatedWishlist });
+    res.status(200).json({ success: true, message: 'Product removed from wishlist.', wishlist: updatedWishlist });
   } catch (error) {
-    console.error('Error removing product from wishlist:', error);
-    res.status(500).json({ message: 'Server error', error });
+    console.error('Error removing from wishlist:', error);
+    res.status(500).json({ success: false, message: 'Server error', error: error.message });
   }
 };

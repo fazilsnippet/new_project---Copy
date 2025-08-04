@@ -97,99 +97,163 @@
 //   useFetchUserProfileQuery,
 // } = userSlice;
 
-import { apiSlice } from './apiSlice';  // Import the base apiSlice setup
-import { USERS_URL } from '../constants'; // Ensure this is the correct path for your URL constants
-
+import { apiSlice } from './apiSlice';  
+import { USERS_URL } from '../constants'; 
 export const userSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // Register user (public route)
-    registerUser: builder.mutation({
-      query: (userData) => ({
-        url: `${USERS_URL}/register`, // POST request to register a new user
-        method: 'POST',
-        body: userData, // Send user registration data
+    
+    // Register user
+    // registerUser: builder.mutation({
+    //   query: (userData) => ({
+    //     url: `${USERS_URL}/register`,
+    //     method: 'POST',
+    //     body: userData,
+    //   }),
+    //   transformResponse: (response) => {
+    //     const { accessToken, refreshToken, user } = response;
+
+    //     // Store tokens (optional: move to setCredentials if you want a single place)
+    //     if (accessToken) localStorage.setItem("token", accessToken);
+    //     if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+
+    //     return { user, accessToken, refreshToken };
+    //   }
+    // }),
+
+    sendSignupOtp: builder.mutation({
+      query: (email) => ({
+        url: `${USERS_URL}/register/sendotp`,
+        method: "POST",
+        body: { email },
       }),
     }),
 
-    // Login user (public route)
+    // Register user with OTP
+    registerUserWithOtp: builder.mutation({
+      query: (userData) => ({
+        url: `${USERS_URL}/register`,
+        method: "POST",
+        body: userData,
+      }),
+      transformResponse: (response) => {
+        const { accessToken, refreshToken, user } = response;
+
+        // Store tokens
+        if (accessToken) localStorage.setItem("token", accessToken);
+        if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+
+        return { user, accessToken, refreshToken };
+      }
+    }),
+
+    // Login user
     loginUser: builder.mutation({
       query: (credentials) => ({
         url: `${USERS_URL}/login`,
         method: 'POST',
         body: credentials,
-        credentials: 'include', // Ensure cookies are sent (if used for JWT)
+        credentials: 'include', // Send cookies if backend uses them
       }),
       transformResponse: (response) => {
-        console.log("Login Response:", response);
-        // Store the access token in localStorage for further requests
-        localStorage.setItem("token", response.accessToken);  // Store the token under 'token'
-        return response;
-      },
+        const { accessToken, refreshToken, user } = response;
+
+        if (accessToken) localStorage.setItem("token", accessToken);
+        if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+
+        return { user, accessToken, refreshToken };
+      }
     }),
 
-    // Logout user (protected route)
+    // Logout user
     logoutUser: builder.mutation({
       query: () => ({
         url: `${USERS_URL}/logout`,
         method: 'POST',
       }),
-      // Optionally clear localStorage or cookies here when the user logs out
       transformResponse: () => {
-        localStorage.removeItem("token");  // Clear token on logout
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userInfo");
+        localStorage.removeItem("expirationTime");
         return null;
       },
     }),
 
-    // Refresh access token (public route)
+    // Refresh token
     refreshToken: builder.mutation({
       query: () => ({
-        url: `${USERS_URL}/refresh-token`, // POST request to refresh access token
+        url: `${USERS_URL}/refreshtoken`,
         method: 'POST',
       }),
     }),
 
-    // Change password (protected route)
+    // Change password
     changePassword: builder.mutation({
       query: (passwordData) => ({
-        url: `${USERS_URL}/change-password`, // PUT request to change password
+        url: `${USERS_URL}/changepassword`,
         method: 'PUT',
-        body: passwordData, // Send current and new password details
+        body: passwordData,
       }),
     }),
 
-    // Update account details (protected route)
+    // Update account details
     updateAccount: builder.mutation({
       query: (updateData) => ({
-        url: `${USERS_URL}/update-account`, // PUT request to update user account
+        url: `${USERS_URL}/updateaccount`,
         method: 'PUT',
-        body: updateData, // Send updated account details (e.g., userName, fullName, address, phone)
+        body: updateData,
       }),
     }),
 
-    // Reset password (public route)
+    // Reset password
     resetPassword: builder.mutation({
       query: (resetData) => ({
-        url: `${USERS_URL}/reset-password`, // POST request to reset password
+        url: `${USERS_URL}/resetpassword`,
         method: 'POST',
-        body: resetData, // Send reset token and new password
+        body: resetData,
       }),
     }),
 
-    // Fetch user profile (protected route)
+    // Fetch profile
     fetchUserProfile: builder.query({
       query: () => ({
-        url: `${USERS_URL}/profile`, // GET request to fetch the logged-in user's profile
+        url: `${USERS_URL}/profile`,
         method: 'GET',
       }),
-      providesTags: ['User'], // Cache the user data under 'User' tag
+      providesTags: ['User'],
+    }),
+
+    // Update address
+    updateUserAddress: builder.mutation({
+      query: (addressData) => ({
+        url: `${USERS_URL}/updateaddress`,
+        method: 'PUT',
+        body: addressData,
+      }),
+      invalidatesTags: ['User'],
+    }),
+
+    // Recently viewed products
+    addRecentlyViewedProduct: builder.mutation({
+      query: (productId) => ({
+        url: `${USERS_URL}/products/${productId}/addrecentlyviewedproduct`,
+        method: 'POST',
+        body: {},
+      }),
+      invalidatesTags: ['User'],
+    }),
+
+    getRecentlyViewedProducts: builder.query({
+      query: () => `${USERS_URL}/recentlyviewedproducts`,
+      providesTags: ['User'],
     }),
   }),
-
-  
 });
 
 export const {
-  useRegisterUserMutation,
+  useRegisterUserWithOtpMutation,
+  useSendSignupOtpMutation,
+  // useRegisterUserMutation,
   useLoginUserMutation,
   useLogoutUserMutation,
   useRefreshTokenMutation,
@@ -197,4 +261,7 @@ export const {
   useUpdateAccountMutation,
   useResetPasswordMutation,
   useFetchUserProfileQuery,
+  useUpdateUserAddressMutation,
+  useAddRecentlyViewedProductMutation,
+  useGetRecentlyViewedProductsQuery,
 } = userSlice;

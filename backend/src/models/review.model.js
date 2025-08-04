@@ -4,12 +4,12 @@ const reviewSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Reference to the User model
+      ref: "User",
       required: [true, "Review must be associated with a user"],
     },
     product: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product", // Reference to the Product model
+      ref: "Product",
       required: [true, "Review must be associated with a product"],
     },
     rating: {
@@ -22,12 +22,20 @@ const reviewSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    title: {
+      type: String,
+      trim: true,
+      maxlength: 100,
+    },
     isVerifiedPurchase: {
       type: Boolean,
-      default: false, // Set to true if the review comes from a verified order
+      default: false,
     },
   },
   { timestamps: true }
 );
+
+// ✅ Ensure one review per product per user
+reviewSchema.index({ user: 1, product: 1 }, { unique: true });
 
 export const Review = mongoose.model("Review", reviewSchema);

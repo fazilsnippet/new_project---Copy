@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial;
+        background: #f4f4f4;
+        padding: 20px;
+        color: #333;
+      }
+      .box {
+        background: white;
+        padding: 20px;
+        border-radius: 6px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      .otp {
+        font-size: 24px;
+        font-weight: bold;
+        color: #e53935;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <h2>Password Reset OTP</h2>
+      <p>Use the OTP below to reset your password. It will expire in <%= expiresIn %> minutes.</p>
+      <p class="otp"><%= otp %></p>
+      <p>If you didn't request this, please ignore this email.</p>
+    </div>
+  </body>
+</html>

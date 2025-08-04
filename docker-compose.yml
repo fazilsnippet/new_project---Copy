@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  prom-server:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    command: npm run dev  # start Vite dev server
+    working_dir: /app
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./backend:/app
+    command: npm run dev     # or "node server.js"
+    working_dir: /app
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile.ai
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ai-service:/app
+    command: python3 main.py
+    working_dir: /app

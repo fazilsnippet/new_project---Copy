@@ -2,139 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-
-body{
-  
-  color: #fff;
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
-input,
-textarea{color: #000;}
-
-/* Login Page Styles */
-.login-container {
-  height: 100vh;
-  width: 100%;
-  overflow-y: auto;
-  background-color: rgb(13, 14, 13);
-  color: rgb(146, 50, 50);
+/* Hide scrollbars (optional) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
-
-.login-section {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  height: 100vh;
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
 }
-
-.login-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.login-box,
-.register-box {
-  background-color: #1a1a1a;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  text-align: center;
-  max-width: 24rem;
-  width: 100%;
-}
-
-.login-title,
-.register-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  color: white;
-  text-transform: uppercase;
-}
-
-.login-error,
-.register-error {
-  color: #ff4d4d;
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-}
-
-.login-form,
-.register-form {
-  display: flex;
-  flex-direction: column;
-}
-
-.login-input-group,
-.register-input-group {
-  margin-bottom: 1rem;
-}
-
-.login-label,
-.register-label {
-  display: block;
-  font-size: 0.875rem;
-  color: rgb(8, 8, 8);
-  margin-bottom: 0.5rem;
-}
-
-.login-input,
-.register-input {
-  width: 100%;
-  padding: 0.5rem;
-  border: none;
-  border-radius: 0.25rem;
-  background-color: #333;
-  color: rgb(243, 239, 239);
-}
-
-.login-button,
-.register-button {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  border-radius: 9999px;
-  background-color: #ff4d4d;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.login-button:hover,
-.register-button:hover {
-  background-color: #e60000;
-}
-
-.login-footer,
-.register-footer {
-  margin-top: 1rem;
-  font-size: 0.875rem;
-  color: rgb(24, 23, 23);
-}
-
-.login-link,
-.register-link {
-  font-weight: bold;
-  color: #4da6ff;
-  text-decoration: none;
-}
-
-.login-link:hover,
-.register-link:hover {
-  color: #1a75ff;
-}
-
-.login-background,
-.register-background {
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-}
-
 

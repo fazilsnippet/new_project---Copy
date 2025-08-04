@@ -1,0 +1,449 @@
+mponents:
+HeroBanner
+
+CategoryGrid
+
+FeaturedProducts
+
+DealOfTheDay
+
+NewArrivals
+
+TopRatedProducts
+
+RecentlyViewed
+
+BrandsCarousel
+
+NewsletterSignup
+
+💡 UI Elements:
+ProductCard
+
+SectionHeading
+
+AddToCart, WishlistButton, BuyNowButton
+
+CountdownTimer
+
+Carousel, Grid, Buttons
+
+✅ 2. Product List Page (ProductsListPage.jsx)
+🔧 Components:
+ProductFilterSidebar
+
+SearchBar
+
+SortOptions
+
+ProductGrid
+
+Pagination
+
+Breadcrumbs
+
+💡 UI Elements:
+ProductCard
+
+MultiRangeSlider, CheckboxGroup
+
+DropdownSelect
+
+LoadMoreButton or Infinite Scroll
+
+✅ 3. Product Details Page (ProductDetailsPage.jsx)
+🔧 Components:
+ImageGallery
+
+ProductInfoSection (title, price, description, variants)
+
+StarRatingDisplay
+
+ReviewSummary
+
+ReviewList
+
+ReviewForm (if logged in)
+
+SimilarProducts
+
+💡 UI Elements:
+QuantitySelector
+
+AddToCartButton, WishlistButton, BuyNowButton
+
+Tabs (for Description, Reviews, Specs)
+
+Accordion (optional)
+
+ProductSpecTable
+
+✅ 4. Cart Page (CartPage.jsx)
+🔧 Components:
+CartItemList
+
+CartItemCard
+
+CartSummaryBox
+
+CouponInput
+
+ContinueShoppingLink
+
+💡 UI Elements:
+QuantityAdjustButtons
+
+RemoveItemButton
+
+ApplyCouponButton
+
+ProceedToCheckoutButton
+
+✅ 5. Checkout / Payment Page (PaymentPage.jsx)
+🔧 Components:
+AddressSelector
+
+AddAddressForm
+
+OrderSummary
+
+RazorpayButton or PaymentGatewayButton
+
+💡 UI Elements:
+RadioSelect for Address
+
+StepperBar for Checkout Steps
+
+CardInput, UPIInput
+
+PaymentLoader
+
+✅ 6. Wishlist Page (WishlistPage.jsx)
+🔧 Components:
+WishlistItemCard
+
+EmptyWishlistMessage
+
+MoveToCartButton
+
+✅ 7. User Profile Page (UserProfile.jsx)
+🔧 Components:
+ProfileSidebar
+
+ProfileInfoCard
+
+EditProfileForm
+
+ChangePasswordForm
+
+AddressManager (AddressList, AddressForm)
+
+ProfileTabs (Profile, Addresses, Password, etc.)
+
+✅ 8. Order Pages
+🔸 Order List Page (OrderList.jsx)
+OrderCard
+
+OrderStatusBadge
+
+OrderDetailsLink
+
+🔸 Order Details Page (OrderDetails.jsx)
+OrderInfoBlock
+
+AddressInfo
+
+PaymentInfo
+
+TrackOrderStep
+
+🔸 Track Order (TrackOrder.jsx)
+StepProgressBar (Ordered → Shipped → Delivered)
+
+✅ 9. Auth Pages (Login.jsx, Register.jsx, etc.)
+🔧 Components:
+LoginForm, RegisterForm
+
+OAuthButtons
+
+ForgotPasswordForm, ResetPasswordForm
+
+💡 UI Elements:
+InputGroup
+
+PasswordToggle
+
+SubmitButton
+
+FormErrorDisplay
+
+✅ 10. Static Pages
+📄 About Us (AboutUs.jsx)
+Company history, vision, image section, etc.
+
+📄 Contact Us (ContactUs.jsx)
+Contact form (ContactForm)
+
+Google Maps embed
+
+Customer service links
+
+✅ 11. Admin Pages (optional)
+If you're building an admin dashboard:
+
+AdminSidebar
+
+AdminProductManager
+
+AdminUserManager
+
+AdminOrderDashboard
+
+AddProductForm
+
+EditProductForm
+
+ProductTable, UserTable, OrderTable
+
+
+edge cases: 
+Here is the complete text version of the edge cases and their solutions — ready for you to copy, format, or convert into a document manually:
+
+
+---
+
+📘 E-commerce Edge Cases & Solutions
+
+
+---
+
+📦 1. Order Delivery
+
+Edge Case: Package delivered to wrong address, but marked "delivered".
+
+Resolution Steps:
+
+OTP/Code-based delivery confirmation.
+
+GPS + timestamp validation from delivery app.
+
+Delivery photo verification.
+
+Buyer complaint triggers a support case.
+
+Escalation to trust & safety team.
+
+
+Tools:
+Mapbox, Google Maps API, Proof of Delivery system, Zendesk, Freshdesk, Audit Trail System
+
+
+---
+
+🛍 2. Product Listing
+
+Edge Case: Seller uploads counterfeit or misleading items.
+
+Resolution Steps:
+
+AI image/content scanning before publish.
+
+Seller trust scoring.
+
+Manual moderation queue.
+
+User reporting triggers human review.
+
+Listing banned and seller penalized.
+
+
+Tools:
+Azure Content Moderator, Hive.ai, AWS Rekognition, NLP Classifier, Manual Review Dashboard
+
+
+---
+
+💳 3. Payment
+
+Edge Case: Payment shows success in gateway but not recorded in backend.
+
+Resolution Steps:
+
+Transaction ID reconciliation script.
+
+Auto-retry backend webhook.
+
+Trigger 'Order Recovery Queue'.
+
+Notify user of mismatch.
+
+Support team verifies and resolves.
+
+
+Tools:
+Razorpay/Stripe Webhooks, Cron Jobs, Kafka, Sentry, LogRocket
+
+
+---
+
+👤 4. User Account
+
+Edge Case: User reports hacked account with fake orders.
+
+Resolution Steps:
+
+Analyze login/session logs.
+
+Lock account and invalidate tokens.
+
+Verify identity with OTP.
+
+Auto-cancel unconfirmed orders.
+
+Fraud team reviews high-risk orders.
+
+
+Tools:
+Fingerprint.com, Cloudflare Logs, JWT, 2FA (Twilio, Firebase Auth)
+
+
+---
+
+🏪 5. Inventory
+
+Edge Case: Race condition – two users buy the last item at the same time.
+
+Resolution Steps:
+
+DB-level stock locking.
+
+Queue-based order placement.
+
+Reject payment if item is sold.
+
+Real-time frontend stock updates.
+
+Refund on failed transaction.
+
+
+Tools:
+MongoDB Transactions, Redis SETNX, PostgreSQL Locks, RabbitMQ, Kafka
+
+
+---
+
+🔄 6. Returns/Refunds
+
+Edge Case: Buyer returns bricks in the box instead of the original product.
+
+Resolution Steps:
+
+Reverse pickup with photo/video proof.
+
+Seller return-inspection workflow.
+
+High-risk user flagging.
+
+Refunds held until item verified.
+
+Pattern detection for fraud.
+
+
+Tools:
+Delivery Photo System, Warehouse Inspection, Return Scoring Algorithm
+
+
+---
+
+🤖 7. AI Limitations
+
+Edge Case: AI recommends adult content to kids due to profile bug.
+
+Resolution Steps:
+
+Add user-age tagging and content metadata.
+
+Filter recommenders via segments.
+
+Negative feedback suppresses content.
+
+Manual override/blacklist feature.
+
+Retrain or rollback faulty model.
+
+
+Tools:
+Content Filters, User Segments, Feedback Loops, Moderation APIs
+
+
+---
+
+
+
+
+const getCategoryById = asyncHandler(async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      return res.status(400).json({ message: "Invalid category ID" });
+    }
+
+    const category = await Category.findById(categoryId).lean();
+
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    const totalProducts = await Product.countDocuments({ category: categoryId });
+
+    const products = await Product.find({ category: categoryId })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    res.status(200).json({
+      category,
+      products,
+      totalProducts,
+      currentPage: page,
+      totalPages: Math.ceil(totalProducts / limit),
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching category", error: error.message });
+  }
+});
+
+
+
+
+
+//dummu
+
+make the icon(categories) round, inside the circle category image should be fit outside bottom of the circle mention the category name, align all the categories horizontal in a single line and add the sliding feature for it,  return (
+    <div className="w-full px-4 py-6">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">All Categories</h1>
+
+        {isLoading && <p className="text-gray-500">Loading categories...</p>}
+        {isError && <p className="text-red-500">{error?.data?.message || "Failed to load categories."}</p>}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {categories.map((cat) => (
+            <div
+              key={cat._id}
+              onClick={() => navigate(`/categories/${cat._id}`)}
+              className="cursor-pointer bg-orange-500 text-white rounded-xl p-5 shadow hover:shadow-md transition"
+            >
+              <h2 className="text-lg font-semibold mb-2">{cat.name}</h2>
+              <p className="text-sm">{cat.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};

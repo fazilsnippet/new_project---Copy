@@ -1,18 +1,24 @@
 import { Cart } from "../models/cart.model.js";
-import { Product } from "../models/product.model.js";
+import  {Product}  from "../models/product.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { findCartByUser, isValidObjectId } from "../utils/helpers.js"; 
-
+import mongoose from "mongoose";
 
 const addToCart = asyncHandler(async (req, res) => {
-  console.log("Received add-to-cart request:", req.body); // Debugging
-  const { id: userId } = req.user;
+  console.log("Received add-to-cart request:", req.body);
+  const userId = req.user?._id;
+
+  if (!userId) {
+    console.log("Unauthorized user: userId is missing");
+    return res.status(401).json({ message: "Unauthorized user.... please login" });
+  }
+
   const { productId, quantity } = req.body;
 
-  if (!productId) {
-    return res.status(400).json({ message: "Missing productId in request body" });
+  if (!productId || !quantity) {
+    return res.status(400).json({ message: "Missing productId or quantity in request body" });
   }
-  
+
   if (!isValidObjectId(productId)) {
     return res.status(400).json({ message: "Invalid product ID" });
   }
@@ -26,9 +32,10 @@ const addToCart = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Product not found" });
   }
 
-  const totalQuantity = cart?.items.find((item) => item.product.equals(productId))
-    ? cart.items.find((item) => item.product.equals(productId)).quantity + quantity
-    : quantity;
+  const existingItem = cart?.items.find((item) => item.product.equals(productId));
+  const totalQuantity = existingItem
+    ? Number(existingItem.quantity) + Number(quantity)
+    : Number(quantity);
 
   if (product.stock < totalQuantity) {
     return res.status(400).json({ message: `Only ${product.stock} units available` });
@@ -38,38 +45,42 @@ const addToCart = asyncHandler(async (req, res) => {
     const newCart = new Cart({
       user: userId,
       items: [{ product: productId, quantity }],
-      totalPrice: product.price * quantity,
+      totalPrice: Number(product.price) * Number(quantity),
     });
     await newCart.save();
     return res.status(201).json({ cart: newCart });
   } else {
-    const existingItem = cart.items.find((item) => item.product.equals(productId));
     if (existingItem) {
-      existingItem.quantity += quantity;
+      existingItem.quantity = Number(existingItem.quantity) + Number(quantity);
     } else {
       cart.items.push({ product: productId, quantity });
     }
 
-    cart.totalPrice += product.price * quantity;
+    cart.totalPrice = Number(cart.totalPrice) + Number(product.price) * Number(quantity); // ✅ fixed
     await cart.save();
     return res.status(200).json({ cart });
   }
 });
 
 
-const getCart = asyncHandler(async (req, res) => {
-  const { id: userId } = req.user;
 
-  const cart = await Cart.findOne({ user: userId }).populate("items.product");
+// const getCart = asyncHandler(async (req, res) => {
+//   const userId = req.user;
 
-  if (!cart) {
-    console.log("Cart is empty");
-    return res.status(200).json({ cart: { items: [], totalPrice: 0 } });
-  }
+//   if (!userId) {
+//     console.log("Unauthorized user: user not found");
+//     return res.status(401).json({ message: "Unauthorized user: user not found" });
+//   }
 
-  res.status(200).json({ cart }); 
-});
+//   const cart = await Cart.findOne({ user: userId }).populate("items.product");
 
+//   if (!cart) {
+//     console.log("Cart is empty");
+//     return res.status(200).json({ cart: { items: [], totalPrice: 0 } });
+//   }
+
+//   res.status(200).json({ cart });
+// });
 // // 2. Get Cart for User
 // const getCart = asyncHandler(async (req, res) => {
 //   const { id:userId } = req.user;
@@ -138,44 +149,35 @@ const getCart = asyncHandler(async (req, res) => {
 
 //   res.status(200).json({ message: "Cart updated successfully", cart });
 // });
-// // 3. Update Item Quantity
-// const updateCartItem = asyncHandler(async (req, res) => {
-//   const { id:userId } = req.user;
-//   const { productId, quantity } = req.body;
 
-//   if (!isValidObjectId(productId)) {
-//     return res.status(400).json({ message: "Invalid product ID" });
-//   }
 
-//   if (quantity < 1) {
-//     return res.status(400).json({ message: "Quantity must be at least 1" });
-//   }
 
-//   const cart = await findCartByUser(userId);
-//   if (!cart) {
-//     return res.status(404).json({ message: "Cart not found" });
-//   }
+const getCart = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
 
-//   const item = cart.items.find(item => item.product.toString() === productId);
-//   if (!item) {
-//     return res.status(404).json({ message: "Product not in cart" });
-//   }
+  if (!userId || !isValidObjectId(userId)) {
+    console.log("Unauthorized: Invalid or missing user ID");
+    return res.status(401).json({ message: "Unauthorized user please login" });
+  }
 
-//   const product = await Product.findById(productId);
-//   if (product.stock < quantity) {
-//     return res.status(400).json({ message: `Only ${product.stock} units available` });
-//   }
+  const cart = await Cart.findOne({ user: userId }).populate("items.product");
 
-//   const priceDifference = product.price * (quantity - item.quantity);
-//   item.quantity = quantity;
-//   cart.totalPrice += priceDifference;
+  if (!cart) {
+    return res.status(200).json({
+      cart: {
+        items: [],
+        totalPrice: 0,
+        images: [],
+      },
+    });
+  }
 
-//   await cart.save();
+  res.status(200).json({ cart });
+});
 
-//   res.status(200).json({ message: "Cart updated successfully" });
-// });
+
 const updateCartItem = asyncHandler(async (req, res) => {
-  console.log("Received req.body:", req.body); // Debugging log
+  console.log("Received req.body:", req.body);
 
   const { id: userId } = req.user;
   const { productId, quantity } = req.body;
@@ -184,13 +186,23 @@ const updateCartItem = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Invalid productId or quantity" });
   }
 
-  const cart = await findCartByUser(userId);
+  const cart = await Cart.findOne({ user: userId }).populate("items.product");
   if (!cart) return res.status(404).json({ message: "Cart not found" });
 
-  const item = cart.items.find((item) => item.product.toString() === productId);
+  const item = cart.items.find(
+    (item) => item.product && item.product._id.toString() === productId
+  );
   if (!item) return res.status(404).json({ message: "Product not in cart" });
 
+  // ✅ Update the quantity
   item.quantity = quantity;
+
+  // ✅ Recalculate total price
+  cart.totalPrice = cart.items.reduce((acc, item) => {
+    return acc + item.quantity * item.product.price;
+  }, 0);
+
+  // ✅ Save cart and return updated version
   await cart.save();
 
   res.status(200).json({ message: "Cart updated successfully", cart });
@@ -199,10 +211,11 @@ const updateCartItem = asyncHandler(async (req, res) => {
 
 
 
+
 // // 4. Remove Item from Cart
 // const removeCartItem = asyncHandler(async (req, res) => {
 //   const { id: userId } = req.user;
-//   const { productId } = req.body;
+//   const { productId } = req.params;
 
 //   if (!isValidObjectId(productId)) {
 //     return res.status(400).json({ message: "Invalid product ID" });
@@ -232,43 +245,46 @@ const updateCartItem = asyncHandler(async (req, res) => {
 // });
 
 const removeCartItem = asyncHandler(async (req, res) => {
-  const { id: userId } = req.user;
-  const { productId } = req.params; // Get from params instead of body
+  const userId = req.user._id;
+  const { productId } = req.params;
 
-  if (!isValidObjectId(productId)) {
+  if (!mongoose.isValidObjectId(productId)) {
     return res.status(400).json({ message: "Invalid product ID" });
   }
 
-  const cart = await findCartByUser(userId);
+  const cart = await Cart.findOne({ user: userId });
   if (!cart) {
     return res.status(404).json({ message: "Cart not found" });
   }
 
-  const itemIndex = cart.items.findIndex(item => item.product.toString() === productId);
+  const itemIndex = cart.items.findIndex(
+    item => item.product.toString() === productId
+  );
   if (itemIndex === -1) {
     return res.status(404).json({ message: "Product not in cart" });
   }
 
-  // Fetch the product to get the price
+  const item = cart.items[itemIndex];
+
+  // Optional: recalculate total using product.price from cart item
   const product = await Product.findById(productId);
   if (!product) {
     return res.status(404).json({ message: "Product not found" });
   }
 
-  cart.totalPrice -= cart.items[itemIndex].quantity * product.price;
-  cart.items.splice(itemIndex, 1); // Remove item from cart
+  cart.totalPrice -= Number(item.quantity) * Number(product.price);
+  cart.items.splice(itemIndex, 1);
 
   await cart.save();
-  res.status(200).json({ message: "Item removed from cart" });
+  res.status(200).json({ message: "Item removed from cart", cart });
 });
 
 
 
-// 5. Clear Cart
 const clearCart = asyncHandler(async (req, res) => {
-  const { id: userId } = req.user;
+  const userId = req.user._id;
 
-  const cart = await findCartByUser(userId);
+  const cart = await Cart.findOne({ user: userId });
   if (!cart) {
     return res.status(404).json({ message: "Cart not found" });
   }
@@ -278,8 +294,9 @@ const clearCart = asyncHandler(async (req, res) => {
 
   await cart.save();
 
-  res.status(200).json({ message: "Cart cleared successfully" });
+  res.status(200).json({ message: "Cart cleared successfully", cart });
 });
+
 
 
 export { addToCart, getCart, updateCartItem, removeCartItem, clearCart };

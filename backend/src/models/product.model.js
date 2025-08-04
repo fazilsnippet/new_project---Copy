@@ -1,89 +1,71 @@
 
-
-
-// import mongoose from "mongoose";
-
-// const productSchema = new mongoose.Schema(
-//   {
-//     name: { type: String, required: true },
-//     brand:{type: String, default:"unknown"},
-//     description: { type: String },
-//     price: { type: Number, required: true },
-//     images: [{ type: String }], // Array of image URLs
-//     category: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }],
-//     stock: { type: Number, default: 0 },
-//     ratings: [
-//       {
-//         userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-//         rating: { type: Number, min: 1, max: 5 },
-//         review: { type: String },
-//         createdAt: { type: Date, default: Date.now }
-//       }
-//     ]
-//   },
-//   { timestamps: true } // Automatically adds createdAt and updatedAt
-// );
-
-// // Index for faster search
-// productSchema.index({ name: 'text', description: 'text' });
-
-// // Static method for calculating ratings
-// productSchema.statics.calculateRatings = function () {
-//   return this.aggregate([
-//     { $unwind: "$ratings" },
-//     {
-//       $group: {
-//         _id: "$_id",
-//         averageRating: { $avg: "$ratings.rating" },
-//         totalRatings: { $sum: 1 }
-//       }
-//     },
-//     { $addFields: { averageRating: { $ifNull: ["$averageRating", 0] } } }
-//   ]);
-// };
-
-// export const Product = mongoose.model('Product', productSchema);
-
-
 import mongoose from "mongoose";
+
+const descriptionBlockSchema = new mongoose.Schema({
+  layout: {
+    type: String,
+    enum: ["leftToRight", "rightToLeft"],
+    required: true,
+  },
+  text: { type: String, required: true },
+  image: { type: String, required: true }, // Cloudinary URL
+});
+
 
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    brand:{type: String, default:"unknown"},
+    brand:{ type: mongoose.Schema.Types.ObjectId, ref: 'Brand', required: true },
     description: { type: String },
     price: { type: Number, required: true },
-    images: [{ type: String }], // Array of image URLs
-    category: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }],
+    images: [{ type: String }],
+    category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
     stock: { type: Number, default: 0 },
-    ratings: [
-      {
-        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        rating: { type: Number, min: 1, max: 5 },
-        review: { type: String },
-        createdAt: { type: Date, default: Date.now }
-      }
-    ]
+  descriptionBlocks: [descriptionBlockSchema],
+
+    // Aggregated ratings
+    averageRating: { type: Number, default: 0 },
+    totalRatings: { type: Number, default: 0 },
+      isActive: { type: Boolean, default: true }, 
+
   },
-  { timestamps: true } // Automatically adds createdAt and updatedAt
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-// Index for faster search
+// Text search index
 productSchema.index({ name: 'text', description: 'text' });
 
-// Static method for calculating ratings
-productSchema.statics.calculateRatings = function () {
-  return this.aggregate([
-    { $unwind: "$ratings" },
+// Virtual for reverse population of reviews
+productSchema.virtual("reviews", {
+  ref: "Review",
+  localField: "_id",
+  foreignField: "product"
+});
+
+// Static method to update rating stats
+productSchema.statics.updateRatingStats = async function (productId) {
+  const result = await mongoose.model("Review").aggregate([
+    { $match: { product: new mongoose.Types.ObjectId(productId) } },
     {
       $group: {
-        _id: "$_id",
-        averageRating: { $avg: "$ratings.rating" },
+        _id: "$product",
+        averageRating: { $avg: "$rating" },
         totalRatings: { $sum: 1 }
       }
-    },
-    { $addFields: { averageRating: { $ifNull: ["$averageRating", 0] } } }
+    }
   ]);
+
+  if (result.length > 0) {
+    await this.findByIdAndUpdate(productId, {
+      averageRating: result[0].averageRating,
+      totalRatings: result[0].totalRatings
+    });
+  } else {
+    await this.findByIdAndUpdate(productId, {
+      averageRating: 0,
+      totalRatings: 0
+    });
+  }
 };
 
-export const Product = mongoose.model('Product', productSchema);
+export  const Product = mongoose.model("Product", productSchema);
