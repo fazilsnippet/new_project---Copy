@@ -124,7 +124,6 @@ const getAllProducts = asyncHandler(async (req, res) => {
       Product.countDocuments(filter)
     ]);
 
-<<<<<<< HEAD
     // Response
     res.status(200).json({
       products,
@@ -137,9 +136,8 @@ const getAllProducts = asyncHandler(async (req, res) => {
       filtersApplied: { brand, category, minPrice, maxPrice, search, sort }
     });
 
-=======
+
     res.status(200).json(products); // Now returns only an array
->>>>>>> 3a938804a0b69c468a995ae4442d31accd06bf18
   } catch (error) {
     console.error(error);
     res.status(500).json({
