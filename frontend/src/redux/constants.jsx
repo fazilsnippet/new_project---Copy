@@ -10,3 +10,4 @@ export const WISHLIST_URL = "/api/wishlist";
 export const PAYMENT_URL = "/api/payments";
 export const REVIEW_URL = "/api/reviews";
 export const BRAND_URL ="/api/brand"
+export const SEARCH_URL = "/api/search";

@@ -1,35 +1,57 @@
-// import React, { useState } from "react";
+
+
+// import React, { useState, useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
 // import { useGetAllProductsQuery } from "../../../../redux/api/productApiSlice";
 
 // const SearchBar = () => {
 //   const [search, setSearch] = useState("");
-//   const [submittedSearch, setSubmittedSearch] = useState("");
+//   const [debouncedSearch, setDebouncedSearch] = useState("");
+//   const navigate = useNavigate();
 
-//   const { data, isLoading, isError } = useGetAllProductsQuery({
-//     page: 1,
-//     limit: 10,
-//     search: submittedSearch,
-//     filters: {}, 
-//     sort: "",    
-//   });
+//   // Debounce logic
+//   useEffect(() => {
+//     const handler = setTimeout(() => {
+//       setDebouncedSearch(search.trim());
+//     }, 500);
 
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     setSubmittedSearch(search);
+//     return () => clearTimeout(handler);
+//   }, [search]);
+
+//   // Fetch products
+//   const { data, isLoading, isError } = useGetAllProductsQuery(
+//     {
+//       page: 1,
+//       limit: 10,
+//       search: debouncedSearch,
+//       filters: {},
+//       sort: "",
+//     },
+//     {
+//       skip: debouncedSearch === "",
+//     }
+//   );
+
+//   // Navigate to product page & reset search input
+//   const handleProductClick = (id) => {
+//     navigate(`/products/${id}`);
+//     setSearch("");            // Clear input
+//     setDebouncedSearch("");   // Clear debounced state (collapses results)
 //   };
 
 //   return (
 //     <>
+//       {/* Search Input */}
 //       <form
-//         onSubmit={handleSubmit}
-//         className="flex items-center max-w-lg mx-auto mb-4"
+//         onSubmit={(e) => e.preventDefault()}
+//         className="flex items-center max-w-4xl mx-auto"
 //       >
-//         <label htmlFor="voice-search" className="sr-only">
+//         <label htmlFor="product-search" className="sr-only">
 //           Search
 //         </label>
 
 //         <div className="relative w-full">
-//           <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+//           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
 //             <svg
 //               viewBox="0 0 21 21"
 //               fill="none"
@@ -42,60 +64,57 @@
 //                 strokeLinejoin="round"
 //                 strokeLinecap="round"
 //                 stroke="currentColor"
-//               ></path>
+//               />
 //             </svg>
 //           </div>
 
 //           <input
 //             type="text"
-//             id="voice-search"
-//             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-//             placeholder="Search..."
+//             id="product-search"
+//             className="bg-white border border-gray-300 text-gray-900 text-sm rounded-full focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
+//             placeholder="Search products..."
 //             value={search}
 //             onChange={(e) => setSearch(e.target.value)}
-//             required
 //           />
 //         </div>
-
-//         <button
-//           type="submit"
-//           className="inline-flex items-center py-2.5 px-3 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-//         >
-//           <svg
-//             viewBox="0 0 20 20"
-//             fill="none"
-//             xmlns="http://www.w3.org/2000/svg"
-//             className="w-4 h-4 me-2"
-//           >
-//             <path
-//               d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-//               strokeWidth="2"
-//               strokeLinejoin="round"
-//               strokeLinecap="round"
-//               stroke="currentColor"
-//             ></path>
-//           </svg>
-//           Search
-//         </button>
 //       </form>
 
-//       {/* Display results */}
-//       {isLoading && <p className="text-center text-gray-500">Loading...</p>}
-//       {isError && <p className="text-center text-red-500">Error loading products.</p>}
-
-//       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
-//         {data?.products?.length > 0 ? (
-//           data.products.map((product) => (
-//             <div key={product._id} className="border p-4 rounded-lg shadow">
-//               <h3 className="text-lg font-semibold">{product.name}</h3>
-//               <p className="text-sm text-gray-600">{product.brand}</p>
-//               <p className="text-sm text-gray-800">{product.description}</p>
-//             </div>
-//           ))
-//         ) : (
-//           <p className="col-span-full text-center text-gray-500">No products found.</p>
+//       {/* Status messages */}
+//       <div className="max-w-6xl px-4 mx-auto mt-4">
+//         {isLoading && <p className="text-center text-gray-500">Loading...</p>}
+//         {isError && (
+//           <p className="text-center text-red-500">Error loading products.</p>
 //         )}
+//         {debouncedSearch &&
+//           !isLoading &&
+//           !isError &&
+//           (!data || data.products?.length === 0) && (
+//             <p className="text-center text-gray-500">No products found.</p>
+//           )}
 //       </div>
+
+//       {/* Search Results */}
+//       {debouncedSearch && data?.products?.length > 0 && (
+//         <div className="grid max-w-6xl grid-cols-1 gap-4 px-4 mx-auto mt-4 sm:grid-cols-2 lg:grid-cols-3">
+//           {data.products.map((product) => (
+//             <div
+//               key={product._id}
+//               className="p-4 transition border rounded-lg shadow cursor-pointer hover:shadow-md"
+//               onClick={() => handleProductClick(product._id)}
+//             >
+//               <h3 className="text-lg font-semibold">{product.name}</h3>
+//               <p className="text-sm text-gray-600">
+//                 {product.brand?.name || "Unknown Brand"}
+//               </p>
+//               <p className="text-sm text-gray-800 line-clamp-2">
+//                 {typeof product.description === "string"
+//                   ? product.description
+//                   : JSON.stringify(product.description)}
+//               </p>
+//             </div>
+//           ))}
+//         </div>
+//       )}
 //     </>
 //   );
 // };
@@ -104,49 +123,48 @@
 
 
 import React, { useState, useEffect } from "react";
-import { useGetAllProductsQuery } from "../../../../redux/api/productApiSlice";
-
+import { useNavigate } from "react-router-dom";
+import { useSearchProductsMutation } from "../../../../redux/api/searchApiSlice";
 const SearchBar = () => {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [triggerSearch, { data, isLoading, isError }] = useSearchProductsMutation();
+  const navigate = useNavigate();
 
-  // Debounce input: update debouncedSearch only after 500ms of inactivity
+  // Debounce logic
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search.trim());
     }, 500);
-
-    return () => {
-      clearTimeout(handler);
-    };
+    return () => clearTimeout(handler);
   }, [search]);
 
-  // Query with debounced search
-  const { data, isLoading, isError } = useGetAllProductsQuery(
-    {
-      page: 1,
-      limit: 10,
-      search: debouncedSearch,
-      filters: {},
-      sort: "",
-    },
-    {
-      skip: debouncedSearch === "", // skip if empty
+  // Trigger search when debouncedSearch changes
+  useEffect(() => {
+    if (debouncedSearch) {
+      triggerSearch(debouncedSearch);
     }
-  );
+  }, [debouncedSearch, triggerSearch]);
+
+  // Navigate to product page & reset search input
+  const handleProductClick = (id) => {
+    navigate(`/products/${id}`);
+    setSearch("");
+    setDebouncedSearch("");
+  };
 
   return (
     <>
+      {/* Search Input */}
       <form
         onSubmit={(e) => e.preventDefault()}
-        className="flex items-center max-w-lg mx-auto mb-4"
+        className="flex items-center max-w-4xl mx-auto"
       >
         <label htmlFor="product-search" className="sr-only">
           Search
         </label>
-
         <div className="relative w-full">
-          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <svg
               viewBox="0 0 21 21"
               fill="none"
@@ -162,11 +180,10 @@ const SearchBar = () => {
               />
             </svg>
           </div>
-
           <input
             type="text"
             id="product-search"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+            className="bg-white border border-gray-300 text-gray-900 text-sm rounded-full focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -174,26 +191,40 @@ const SearchBar = () => {
         </div>
       </form>
 
-      {/* Loading / error states */}
-      {isLoading && <p className="text-center text-gray-500">Loading...</p>}
-      {isError && <p className="text-center text-red-500">Error loading products.</p>}
+      {/* Status messages */}
+      <div className="max-w-6xl px-4 mx-auto mt-4">
+        {isLoading && <p className="text-center text-gray-500">Loading...</p>}
+        {isError && (
+          <p className="text-center text-red-500">Error loading products.</p>
+        )}
+        {debouncedSearch &&
+          !isLoading &&
+          !isError &&
+          (!data || !data.results || data.results.length === 0) && (
+            <p className="text-center text-gray-500">No products found.</p>
+          )}
+      </div>
 
-      {debouncedSearch && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
-        {data.products.map((product) => (
-  <div key={product._id} className="border p-4 rounded-lg shadow">
-    <h3 className="text-lg font-semibold">{product.name}</h3>
-    <p className="text-sm text-gray-600">
-      {product.brand?.name || "Unknown Brand"}
-    </p>
-    <p className="text-sm text-gray-800">
-      {typeof product.description === "string"
-        ? product.description
-        : JSON.stringify(product.description)}
-    </p>
-  </div>
-))}
-
+      {/* Search Results */}
+      {debouncedSearch && data?.results?.length > 0 && (
+        <div className="grid max-w-6xl grid-cols-1 gap-4 px-4 mx-auto mt-4 sm:grid-cols-2 lg:grid-cols-3">
+          {data.results.map((product) => (
+            <div
+              key={product._id}
+              className="p-4 transition border rounded-lg shadow cursor-pointer hover:shadow-md"
+              onClick={() => handleProductClick(product._id)}
+            >
+              <h3 className="text-lg font-semibold">{product.name}</h3>
+              <p className="text-sm text-gray-600">
+                {product.brand?.name || "Unknown Brand"}
+              </p>
+              <p className="text-sm text-gray-800 line-clamp-2">
+                {typeof product.description === "string"
+                  ? product.description
+                  : JSON.stringify(product.description)}
+              </p>
+            </div>
+          ))}
         </div>
       )}
     </>

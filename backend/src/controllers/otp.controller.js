@@ -21,6 +21,8 @@ export const sendSignupOtp = async (req, res) => {
   }
 };
 
+
+
 export const verifySignupOtp = async (req, res) => {
   try {
     const { email, otp, password } = req.body;

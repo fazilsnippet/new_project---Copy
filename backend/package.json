@@ -30,6 +30,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.13.4",
     "@grpc/proto-loader": "^0.7.15",
+    "ai": "^5.0.44",
     "axios": "^1.9.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
@@ -43,6 +44,7 @@
     "express-async-handler": "^1.2.0",
     "form-data": "^4.0.3",
     "jsonwebtoken": "^9.0.2",
+    "langchain": "^0.3.33",
     "mongoose": "^8.8.4",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^7.0.5",

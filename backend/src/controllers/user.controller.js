@@ -669,9 +669,19 @@ export const generateAccessTokenAndRefreshToken = async (userId) => {
   }
 
   // Check OTP
-  const otpRecord = await OTP.findOne({ email, otp, purpose: "signup" });
-  if (!otpRecord) throw new ApiError(400, "Invalid OTP");
-  if (otpRecord.expiresAt < new Date()) throw new ApiError(400, "OTP expired");
+  // const otpRecord = await OTP.findOne({ email, otp, purpose: "signup" });
+  // if (!otpRecord) throw new ApiError(400, "Invalid OTP");
+  // if (otpRecord.expiresAt < new Date()) throw new ApiError(400, "OTP expired");
+
+const otpRecord = await OTP.findOneAndDelete({
+  email,
+  otp,
+  purpose: "signup",
+  expiresAt: { $gt: new Date() } // only match if not expired
+});
+
+if (!otpRecord) throw new ApiError(400, "Invalid or expired OTP");
+
 
   // Check if user exists
   const existedUser = await User.findOne({ $or: [{ userName }, { email }] });

@@ -145,7 +145,7 @@ function App() {
         {/* Protected Routes */}
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/users/profile" element={<UserProfile />} />
-          {/* <Route path="/ordersuccess/:orderId" element={<OrderSuccessPage />} /> */}
+          <Route path="/ordersuccess/:orderId" element={<OrderSuccessPage />} />
           <Route path="/cart" element={<CartList />} />
           <Route path="/orders" element={<UserOrders />} />
           <Route path="/orders/:id" element={<OrderDetailPage />} />

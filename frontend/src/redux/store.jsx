@@ -12,10 +12,13 @@ import {reviewSlice} from './api/reviewApiSlice';  // Import the review slice
 import { paymentSlice } from './api/paymentApiSlice';  // Import paymentApi for handling payment-related logic
 import { adminApi } from './api/adminApiSlice';
 import { brandSlice } from './api/brandApiSlice';
+import { searchApi } from './api/searchApiSlice';
 const store = configureStore({
   reducer: {
+
     // Integrating apiSlice and other feature-specific slices
     [apiSlice.reducerPath]: apiSlice.reducer,  // Add the base apiSlice reducer for automatic caching
+    [searchApi.reducerPath]: searchApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,  // Add the adminApi reducer for admin-related logic
     [cartSlice.reducerPath]: cartSlice.reducer,  // Add the cart slice
     [categorySlice.reducerPath]: categorySlice.reducer,  // Add the category slice

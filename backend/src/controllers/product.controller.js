@@ -10,94 +10,20 @@ import fs from "fs";
 
 
 
-// const getAllProducts = asyncHandler(async (req, res) => {
-//   try {
-//     const { brand, category, minPrice, maxPrice, search, sort, page = 1, limit = 20 } = req.query;
-
-//     const filter = {};
-
-//     if (category) filter.category = category;
-//     if (brand) filter.brand = brand;
-//     if (minPrice || maxPrice) {
-//       filter.price = {};
-//       if (minPrice) filter.price.$gte = parseFloat(minPrice);
-//       if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
-//     }
-
-//     if (search) {
-//       filter.$or = [
-//         { name: { $regex: search, $options: "i" } },
-//         { description: { $regex: search, $options: "i" } },
-//       ];
-//     }
-
-//     const sortOptions = sort ? { [sort]: 1 } : { createdAt: -1 };
-//     const paginationLimit = parseInt(limit, 6);
-//     const skip = (parseInt(page, 10) - 1) * paginationLimit;
-
-//     const [products, totalCount] = await Promise.all([
-//       Product.find(filter)
-//        .populate({
-//   path: "brand",
-//   select: "name",
-//   match: { isActive: true } // optional condition
-// })
-// .populate({
-//   path: "category",
-//   select: "name",
-//   match: { isActive: true } // optional condition
-// })
-
-//         .sort(sortOptions)
-//         .skip(skip)
-//         .limit(paginationLimit),
-//       Product.countDocuments(filter)
-//     ]);
-
-//     res.status(200).json({
-//       products,
-//       totalCount,
-//       currentPage: parseInt(page, 10),
-//       totalPages: Math.ceil(totalCount / paginationLimit),
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({
-//       message: "An error occurred while fetching products",
-//       error: error.message,
-//     });
-//   }
-// });
-
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
-    const {
-      brand,
-      category,
-      minPrice,
-      maxPrice,
-      search,
-      sort = "createdAt:desc",
-      page = 1,
-      limit = 12
-    } = req.query;
+    const { brand, category, minPrice, maxPrice, search, sort, page = 1, limit = 20 } = req.query;
 
     const filter = {};
 
-    // Brand filter
-    if (brand) filter.brand = brand;
-
-    // Category filter
     if (category) filter.category = category;
-
-    // Price range filter
+    if (brand) filter.brand = brand;
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = parseFloat(minPrice);
       if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
     }
 
-    // Search in name or description
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -105,41 +31,35 @@ const getAllProducts = asyncHandler(async (req, res) => {
       ];
     }
 
-    // Sort parsing
-    const [sortField, sortOrder] = sort.split(":");
-    const sortOptions = { [sortField]: sortOrder === "asc" ? 1 : -1 };
-
-    // Pagination
-    const paginationLimit = parseInt(limit, 10);
+    const sortOptions = sort ? { [sort]: 1 } : { createdAt: -1 };
+    const paginationLimit = parseInt(limit, 6);
     const skip = (parseInt(page, 10) - 1) * paginationLimit;
 
-    // Query + count
     const [products, totalCount] = await Promise.all([
       Product.find(filter)
-        .populate({ path: "brand", select: "name", match: { isActive: true } })
-        .populate({ path: "category", select: "name", match: { isActive: true } })
+       .populate({
+  path: "brand",
+  select: "name",
+  match: { isActive: true } // optional condition
+})
+.populate({
+  path: "category",
+  select: "name",
+  match: { isActive: true } // optional condition
+})
+
         .sort(sortOptions)
         .skip(skip)
         .limit(paginationLimit),
       Product.countDocuments(filter)
     ]);
 
-<<<<<<< HEAD
-    // Response
     res.status(200).json({
       products,
-      pagination: {
-        totalCount,
-        currentPage: parseInt(page, 10),
-        totalPages: Math.ceil(totalCount / paginationLimit),
-        limit: paginationLimit
-      },
-      filtersApplied: { brand, category, minPrice, maxPrice, search, sort }
+      totalCount,
+      currentPage: parseInt(page, 10),
+      totalPages: Math.ceil(totalCount / paginationLimit),
     });
-
-=======
-    res.status(200).json(products); // Now returns only an array
->>>>>>> 3a938804a0b69c468a995ae4442d31accd06bf18
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -148,6 +68,83 @@ const getAllProducts = asyncHandler(async (req, res) => {
     });
   }
 });
+
+// const getAllProducts = asyncHandler(async (req, res) => {
+//   try {
+//     const {
+//       brand,
+//       category,
+//       minPrice,
+//       maxPrice,
+//       search,
+//       sort = "createdAt:desc",
+//       page = 1,
+//       limit = 12
+//     } = req.query;
+
+//     const filter = {};
+
+//     // Brand filter
+//     if (brand) filter.brand = brand;
+
+//     // Category filter
+//     if (category) filter.category = category;
+
+//     // Price range filter
+//     if (minPrice || maxPrice) {
+//       filter.price = {};
+//       if (minPrice) filter.price.$gte = parseFloat(minPrice);
+//       if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
+//     }
+
+//     // Search in name or description
+//     if (search) {
+//       filter.$or = [
+//         { name: { $regex: search, $options: "i" } },
+//         { description: { $regex: search, $options: "i" } },
+//       ];
+//     }
+
+//     // Sort parsing
+//     const [sortField, sortOrder] = sort.split(":");
+//     const sortOptions = { [sortField]: sortOrder === "asc" ? 1 : -1 };
+
+//     // Pagination
+//     const paginationLimit = parseInt(limit, 10);
+//     const skip = (parseInt(page, 10) - 1) * paginationLimit;
+
+//     // Query + count
+//     const [products, totalCount] = await Promise.all([
+//       Product.find(filter)
+//         .populate({ path: "brand", select: "name", match: { isActive: true } })
+//         .populate({ path: "category", select: "name", match: { isActive: true } })
+//         .sort(sortOptions)
+//         .skip(skip)
+//         .limit(paginationLimit),
+//       Product.countDocuments(filter)
+//     ]);
+
+//     // Response
+//     res.status(200).json({
+//       products,
+//       pagination: {
+//         totalCount,
+//         currentPage: parseInt(page, 10),
+//         totalPages: Math.ceil(totalCount / paginationLimit),
+//         limit: paginationLimit
+//       },
+//       filtersApplied: { brand, category, minPrice, maxPrice, search, sort }
+//     });
+
+//     res.status(200).json(products); // Now returns only an array
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       message: "An error occurred while fetching products",
+//       error: error.message,
+//     });
+//   }
+// });
 
 
 const getProductById = asyncHandler(async (req, res) => {

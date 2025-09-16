@@ -74,7 +74,6 @@ import { apiSlice } from './apiSlice';
 import { PRODUCT_URL } from '../constants';
 export const productSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-<<<<<<< HEAD
 //     getAllProducts: builder.query({
 //       query: (params = {}) => {
 //         const { search = '', filters = {} } = params;
@@ -92,11 +91,6 @@ export const productSlice = apiSlice.injectEndpoints({
 // getAllProducts: builder.query({
 //   query: ({ page = 1, limit = 12, search = '', filters = {} } = {}) => {
 //     const queryString = new URLSearchParams();
-=======
-    getAllProducts: builder.query({
-      query: (params = {}) => { 
-        const { search = '', filters = {} } = params;
->>>>>>> 3a938804a0b69c468a995ae4442d31accd06bf18
 
 //     if (search) queryString.append('search', search);
 //     Object.entries(filters).forEach(([key, value]) => {
@@ -116,7 +110,7 @@ export const productSlice = apiSlice.injectEndpoints({
 getAllProducts: builder.query({
   query: ({ page = 1, limit = 12, ...params }) => {
     const queryString = new URLSearchParams({ page, limit, ...params }).toString();
-    return `/api/products?${queryString}`;
+    return `${PRODUCT_URL}?${queryString}`;
   },
   serializeQueryArgs: ({ queryArgs }) => queryArgs, // ensures new query per page
   providesTags: ['Product'],
@@ -154,10 +148,14 @@ getAllProducts: builder.query({
     //   invalidatesTags: ['Product'],
     // }),
 
-    getProducts: builder.query({
-  query: () => `${PRODUCT_URL}/products?limit=5`,
+ getProducts: builder.query({
+  query: () => ({
+    url: `${PRODUCT_URL}/products`,
+    params: { limit: 5 },
+  }),
   providesTags: ['Product'],
 }),
+
 
     // deleteProduct: builder.mutation({
     //   query: (productId) => ({

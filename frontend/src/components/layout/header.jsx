@@ -1,52 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  FaSearch,
   FaUser,
   FaShoppingCart,
   FaBars,
   FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router";
-import { useGetAllProductsQuery } from "../../redux/api/productApiSlice.js";
-import hero from "../ui/hero.jsx"
+import SearchBar from "../features/products/product.search/ProductSearch.jsx"; // Adjust path if needed
+
 const Header = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
   const menuRef = useRef();
-
-  // Debounce search input
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search.trim());
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [search]);
-
-  // Search API
-  const { data, isLoading, isError } = useGetAllProductsQuery(
-    {
-      page: 1,
-      limit: 10,
-      search: debouncedSearch,
-      filters: {},
-      sort: "",
-    },
-    {
-      skip: debouncedSearch === "",
-    }
-  );
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
 
   const handleNavigation = (path) => {
     navigate(path);
-    setMenuOpen(false);
-  };
-
-  const handleProductClick = (productId) => {
-    navigate(`/products/${productId}`);
     setMenuOpen(false);
   };
 
@@ -124,76 +94,22 @@ const Header = () => {
           {/* Links */}
           <button
             onClick={() => handleNavigation("/users/profile")}
-            className="block w-full text-left py-2 px-2 hover:bg-orange-500 rounded"
+            className="block w-full text-left py-2 px-2 hover:bg-orange-600 rounded"
           >
             <FaUser className="inline mr-2" /> Profile
           </button>
           <button
             onClick={() => handleNavigation("/cart")}
-            className="block w-full text-left py-2 px-2 hover:bg-orange-500 rounded"
+            className="block w-full text-left py-2 px-2 hover:bg-orange-600 rounded"
           >
             <FaShoppingCart className="inline mr-2" /> Cart
           </button>
         </div>
       </div>
 
-      {/* Search Bar Below Header */}
-      <div className="w-full bg-orange-500 py-4 px-4 shadow-sm sticky top-[64px] z-40">
-        <div className="max-w-4xl mx-auto flex items-center gap-3 bg-gray-100 rounded-full px-4 py-2">
-          <FaSearch className="text-gray-500" />
-          <input
-            type="text"
-            className="w-full bg-transparent text-sm text-gray-800 focus:outline-none"
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* Search Results */}
-      {debouncedSearch && (
-        <div className="bg-white text-black mt-2 max-w-6xl mx-auto rounded shadow p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {isLoading && (
-            <p className="text-sm text-gray-500 col-span-full">Loading...</p>
-          )}
-          {isError && (
-            <p className="text-sm text-red-500 col-span-full">
-              Error loading products.
-            </p>
-          )}
-          {!isLoading && data?.products?.length === 0 && (
-            <p className="text-sm text-gray-500 col-span-full">
-              No products found.
-            </p>
-          )}
-        {data?.products?.map((product) => (
-  <div
-    key={product._id}
-    onClick={() => handleProductClick(product._id)}
-    className="flex items-center gap-4 p-3 border rounded hover:shadow-md cursor-pointer"
-  >
-    <img
-      src={product.images?.[0] || "/placeholder.jpg"}
-      alt={product.name}
-      className="w-16 h-16 object-cover rounded"
-    />
-    <div>
-      <p className="text-base font-medium text-gray-900">
-        {product.name || "Unnamed Product"}
-      </p>
-      {/* <p className="text-sm text-gray-600">{product.brand?.brand || "No brand"}</p> */}
-      <p className="text-sm text-gray-500">{product.category?.name || "No category"}</p>
-    </div>
-  </div>
-))}
-
-
-        </div>
-      )}
-
-      {/* Hero Section Below Header */}
-      <div>
+      {/* Search Bar Component */}
+      <div className="sticky top-[64px] z-40 bg-orange-500 py-4 px-4">
+        <SearchBar />
       </div>
     </div>
   );
