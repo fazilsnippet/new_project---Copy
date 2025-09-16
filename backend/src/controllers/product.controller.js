@@ -54,12 +54,15 @@ const getAllProducts = asyncHandler(async (req, res) => {
       Product.countDocuments(filter)
     ]);
 
+    // Response
     res.status(200).json({
       products,
       totalCount,
       currentPage: parseInt(page, 10),
       totalPages: Math.ceil(totalCount / paginationLimit),
     });
+
+    res.status(200).json(products); // Now returns only an array
   } catch (error) {
     console.error(error);
     res.status(500).json({
