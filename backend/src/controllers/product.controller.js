@@ -252,7 +252,7 @@ export const handleSemanticSearch = async (req, res) => {
     const formData = new FormData();
     formData.append("text", text);
 
-    const response = await axios.post("http://localhost:8000/semantic-search", formData, {
+    const response = await axios.post("http://localhost:8000/search", formData, {
       headers: formData.getHeaders()
     });
 

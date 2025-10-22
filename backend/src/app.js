@@ -57,7 +57,7 @@ app.post("/api/analyze-review", async (req, res) => {
 // Node.js calling Python microservice
 // Node.js calling Python microservice
 async function searchProducts(text) {
-  const res = await axios.post("http://127.0.0.1:8000/semantic-search", { text });
+  const res = await axios.post("http://127.0.0.1:8000/search", { text });
   return res.data;
 }
 
