@@ -214,6 +214,8 @@ mongo_client = MongoClient(MONGO_URI)
 db = mongo_client[MONGO_DB]
 products_collection = db[MONGO_COLLECTION]
 
+print("Products count:", db["products"].count_documents({}))
+
 # embedding model (SentenceTransformer)
 embed_model = SentenceTransformer(EMBED_MODEL_NAME)
 
@@ -239,53 +241,65 @@ def create_index_if_not_exists():
     mapping = {
         "mappings": {
             "properties": {
-                "name": {"type": "text", "analyzer": "standard", "fields": {"keyword": {"type": "keyword"}}},
+                "name": {
+                    "type": "text",
+                    "analyzer": "standard",
+                    "fields": {"keyword": {"type": "keyword"}}
+                },
                 "description": {"type": "text", "analyzer": "standard"},
                 "brand": {"type": "keyword"},
                 "price": {"type": "double"},
                 "images": {"type": "keyword"},
-                # Dense vector used for semantic similarity
                 "embedding": {
                     "type": "dense_vector",
                     "dims": EMBED_DIMS,
                     "index": True,
-                    # similarity param may vary by ES version; it's fine to omit in some versions
-                    # "similarity": "cosine"
+                    "similarity": "cosine"
                 }
             }
         }
     }
+
     es.indices.create(index=ES_INDEX, body=mapping)
-    app.logger.info(f"Created index '{ES_INDEX}' with mapping.")
+    app.logger.info(f"✅ Created index '{ES_INDEX}' with mapping.")
 
 # ---------------------------
 # Helper: sync embeddings from MongoDB -> Elasticsearch
 # - If a product has no embedding in MongoDB, compute and save it to MongoDB first.
 # - Then index (upsert) document into ES with embedding and text fields.
 # ---------------------------
+from bson import ObjectId
+
 def sync_all_embeddings(batch_size=500):
     create_index_if_not_exists()
-    cursor = products_collection.find({}, no_cursor_timeout=True)
+    cursor = products_collection.find({})
     actions = []
     count = 0
+
     for product in cursor:
-        pid = product.get("_id")
+        pid = str(product.get("_id"))
         name = product.get("name", "") or ""
         description = product.get("description", "") or ""
         images = product.get("images", [])
         price = product.get("price", 0)
-        brand = product.get("brand", "")
+        
+        # Convert brand safely
+        brand_val = product.get("brand", "")
+        if isinstance(brand_val, dict) and "$oid" in brand_val:
+            brand = str(brand_val["$oid"])
+        elif isinstance(brand_val, ObjectId):
+            brand = str(brand_val)
+        else:
+            brand = str(brand_val)
 
-        # Ensure embedding exists in MongoDB; if not, compute and save
+        # Ensure embedding
         embedding = product.get("embedding")
-        if embedding is None:
+        if not embedding:
             combined = f"{name} {description}"
-            vec = embed_model.encode(combined).astype(float).tolist()
-            # persist embedding back to MongoDB (so we do not recompute later)
-            products_collection.update_one({"_id": pid}, {"$set": {"embedding": vec}})
+            vec = embed_model.encode(combined, normalize_embeddings=True).astype(float).tolist()
+            products_collection.update_one({"_id": ObjectId(pid)}, {"$set": {"embedding": vec}})
             embedding = vec
 
-        # Prepare ES doc
         doc = {
             "name": name,
             "description": description,
@@ -294,25 +308,26 @@ def sync_all_embeddings(batch_size=500):
             "images": images,
             "embedding": embedding
         }
+
         actions.append({
             "_op_type": "index",
             "_index": ES_INDEX,
-            "_id": str(pid),
+            "_id": pid,
             "_source": doc
         })
 
         count += 1
-        # bulk index in batches
         if len(actions) >= batch_size:
             helpers.bulk(es, actions)
             actions = []
-            app.logger.info(f"Indexed {count} documents so far...")
+            app.logger.info(f"Indexed {count} so far...")
 
     if actions:
         helpers.bulk(es, actions)
     cursor.close()
-    app.logger.info(f"Sync complete. Total indexed: {count}")
+    app.logger.info(f"✅ Sync complete. Total indexed: {count}")
     return {"indexed": count}
+
 
 # ---------------------------
 # Helper: cosine similarity (numpy)
@@ -459,7 +474,6 @@ def search():
         if not prod:
             # try ObjectId conversion
             try:
-                from bson import ObjectId
                 prod = products_collection.find_one({"_id": ObjectId(fid)})
             except Exception:
                 prod = None
@@ -500,6 +514,8 @@ def create_index_endpoint():
 def sync_embeddings_endpoint():
     res = sync_all_embeddings()
     return jsonify(res), 200
+
+
 
 @app.route("/", methods=["GET"])
 def home():
